@@ -13,13 +13,20 @@ to obtain the help call
 python esecutorePhyloH5.py
 
 
- -f filename	   Use this file as the phylogeny file [phylo].\\
+ -f filename	   Use this file as the phylogeny file [phylo].
+ 
  -o filename       Use this file to record output
+ 
  -s filename       Use this file as the sample file [sample].
+ 
  -g filename       Use this file as the group file [group]
+ 
  -r INT		   Number of randomizations to use [999]
+ 
  -q float          q parameter in the hill series (q=1 index is beta is Chao phylogenetic entropy, q=2 Rao phylogenetic diversity,q  zero is faith phylogenetic diversity)
+ 
  -x string         two possible strings :"nexml" or "phyloxml" to select the xml output of the results
+ 
  -h 0 or 1         boolean to check if you want html output   
  
  The script is exposed behind a webservice. For details visit https://www.biodiversitycatalogue.org/rest_methods/143
