@@ -6,7 +6,8 @@ The script estimate the phylogenetic entropy and the phylogenetic mutual informa
 The script user the API https://github.com/albertyw/itol-api to load the reference 
 tree and the estimate of entropy and mutual information on itol web site (http://itol.embl.de/) and produce an output.
 
-HOW to use:
+With Complements to: [ETE2 python library](http://pythonhosted.org/ete2/),[iTOL (Interactive Tree of Life)](http://itol.embl.de/), [Python API for the Interactive Tree of Life ](https://github.com/albertyw/itol-api), [numpy](http://www.numpy.org/),[scipy](http://www.scipy.org/), [Biopython](http://biopython.org/wiki/Main_Page)
+###RUNNING FROM COMMAND LINE
 python esecutorePhyloH5.py [-option] [value]
 option -f  -s, -g, -r are mandatory
 to obtain the help call
@@ -30,3 +31,5 @@ python esecutorePhyloH5.py
  -h 0 or 1         boolean to check if you want html output   
  
  The script is exposed behind a webservice. For details visit https://www.biodiversitycatalogue.org/rest_methods/143
+
+Send e-mails to Saverio Vicario (the repo owner) for questions and comments
