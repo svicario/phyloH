@@ -13,7 +13,7 @@ to obtain the help call
 python esecutorePhyloH5.py
 
 
- -f filename	   Use this file as the phylogeny file [phylo].
+ -f filename	   Use this file as the phylogeny file [phylo].\\
  -o filename       Use this file to record output
  -s filename       Use this file as the sample file [sample].
  -g filename       Use this file as the group file [group]
