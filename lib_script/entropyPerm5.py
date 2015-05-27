@@ -17,6 +17,10 @@ import os
 import numpy
 
 
+def Diversity2Perc(D, Cardinality,q=1):
+    res=(((1/D)**(q-1.000001)-(1/Cardinality)**(q-1.000001))/(1-(1/Cardinality)**(q-1.000001)))
+    return res
+
 def flatTree(db):
     for i in db.tree.traverse():
         if i.is_leaf():
@@ -123,6 +127,10 @@ class DBdata:
         self.ChaoShenCorr=False
         self.withTree=True
         self.withGroups=True
+    def noGroup(self):
+        sample=dict([[y,[x]] for x, y in enumerate(self.samplesNames)])
+        self.groups=sample
+        self.expandTable()
     def readGroupTable(self,filename):
         """
                A given Sample belong always to the same environment, then each sample is cited only once in the file
@@ -156,10 +164,13 @@ class DBdata:
         there should be only one instance of combination of  Treeleaf and samplenumber
         A contingency table would be built based with one row for each Treeleaf and one columns for each sample, while several columns will belong to a given environment
         """
-        s=open(filename,'r').readlines()
-        S=[x.split() for x in s]
+        try:
+            s=filename.readlines()
+        except AttributeError:
+            s=open(filename,'r').readlines()
+        S=[x.strip().split("\t") for x in s]
         SS=zip(*S)
-        assert len(SS)==3 
+        assert len(SS)==3, SS
         names=list(set(SS[2]))
         leaves=dict([[y,x] for x, y in enumerate(names)])
         self.samplesNames=list(set(SS[0]))
@@ -279,8 +290,6 @@ class DBdata:
             Col=self.countTable.shape[1]
             T.update([[i,array(Col*[0])] for i in Diff])
             H=TreeKL(t=self.tree, table=T, groups=groups,q=q, record=record, Perm=Perm, branchScore=branchScore)
-            
-            
         return H
         #return TreeKLCS(t=self.tree, table=T, groups=groups,record=record, Chao=self.ChaoShenCorr, Perm=Perm)
     def RarefactionOfRead(self, nrarefazioni, repXrar=1, Perm=0, record=True):

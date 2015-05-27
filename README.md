@@ -9,26 +9,25 @@ tree and the estimate of entropy and mutual information on itol web site (http:/
 With Complements to: [ETE2 python library](http://pythonhosted.org/ete2/),[iTOL (Interactive Tree of Life)](http://itol.embl.de/), [Python API for the Interactive Tree of Life ](https://github.com/albertyw/itol-api), [numpy](http://www.numpy.org/),[scipy](http://www.scipy.org/), [Biopython](http://biopython.org/wiki/Main_Page)
 ###RUNNING FROM COMMAND LINE
 python esecutorePhyloH5.py [-option] [value]
+
 option -f  -s, -g, -r are mandatory
+
 to obtain the help call
-python esecutorePhyloH5.py
+"python esecutorePhyloH9.py"
 
 
- -f filename	   Use this file as the phylogeny file [phylo].
- 
- -o filename       Use this file to record output
- 
- -s filename       Use this file as the sample file [sample].
- 
- -g filename       Use this file as the group file [group]
- 
- -r INT		   Number of randomizations to use [999]
- 
- -q float          q parameter in the hill series (q=1 index is beta is Chao phylogenetic entropy, q=2 Rao phylogenetic diversity,q  zero is faith phylogenetic diversity)
- 
- -x string         two possible strings :"nexml" or "phyloxml" to select the xml output of the results
- 
- -h 0 or 1         boolean to check if you want html output   
+     -f filename       Use this file as the phylogeny file [phylo].
+     -o filename       Use this file to record output
+     -t filename       Use this file to get taxonomic information on some tips and map them in internal node
+     -s filename       Use this file as the sample file [sample].
+     -g filename       Use this file as the group file [group]
+     -r INT            Number of randomizations to use [999]
+     -q float          q parameter in the hill series (q=1 index is beta is Chao phylogenetic entropy, q=2 Rao phylogenetic diversity,q  zero is faith phylogenetic diversity)
+     -x string         two possible strings :"nexml" or "phyloxml" to select the xml output of the results
+     -h 0 or 1         boolean to check if you want html output
+     --QR              identify linneage present in the Query but not in the Reference (Need found observation to be tagged with "Query" prefix)
+     --QRC             collapse branch with only query before analysis
+  
  
  The script is exposed behind a webservice. For details visit https://www.biodiversitycatalogue.org/rest_methods/143
 

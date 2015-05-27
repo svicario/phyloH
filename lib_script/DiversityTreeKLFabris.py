@@ -324,6 +324,7 @@ def TreeKL(t, table, groups, q=1,record=True, Perm=False, branchScore=True):
     HalphaAA=[-x.dist*x.ag*log(x.ag+(x.ag==0)) for x in t.traverse()]
     #print HalphaAA 
     HalphaAA=sum(HalphaAA)/t.T["Tag"]
+    betaAkl=betaAkl/(tag/tatot)
     return {"tot":t.T['Ttot'],"tag":t.T['Tag'],"Hgamma":Hgamma, "HalphaBySamples":HalphaC, "MI_treeAndEnvironment":betaA, "MI_treeAndSampleGivenEnvironment":betaCA, "MI_KL":betaAkl,"HalphaByEnvironment":HalphaA, "HgammaEachEnvironment":HalphaAA}
 if __name__=='__main__':
     t=Tree(sys.argv[1])
