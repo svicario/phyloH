@@ -135,7 +135,7 @@ def QRtree(db, R):
     R['HalphaBySamples']= 0
     
 if __name__=="__main__":
-    com={"-q":1, "-qt":None, "-x":"nexml","-R":"/opt/exp_soft/uniba/R/bin/","None":1}
+    com={"-q":1, "-qt":None, "-x":"nexml","-R":"/opt/exp_soft/uniba/R/bin/","None":1, "--QR":"0","--QRC":"1"}
     count=1
     key=None
     for i in sys.argv:
@@ -156,10 +156,10 @@ if __name__=="__main__":
      -q float          q parameter in the hill series (q=1 index is beta is Chao phylogenetic entropy, q=2 Rao phylogenetic diversity,q  zero is faith phylogenetic diversity)
      -x string         two possible strings :"nexml" or "phyloxml" to select the xml output of the results
      -h 0 or 1         boolean to check if you want html output
-     --QR              identify linneage present in the Query but not in the Reference (Need found observation to be tagged with "Query" prefix)
-     --QRC             collapse branch with only query before analysis
+     --QR  0 or 1             identify linneage present in the Query but not in the Reference (Need found observation to be tagged with "Query" prefix)
+     --QRC 0 or 1            collapse branch with only query before analysis
     """
-    if (( (not "--QR" in com) and (not '-s' in com) ) | (not '-f' in com )):
+    if (( (com["--QR"]=="0") and (not '-s' in com) ) | (not '-f' in com )):
         print spiegazione
         raise ImportError
     call=" ".join(sys.argv)
@@ -171,14 +171,14 @@ if __name__=="__main__":
     #Loading the data
     db=DBdata()
     db.readTree(com['-f'])
-    if "--QR" not in com:
+    if com["--QR"]=="0":
         db.readSampleTable(com["-s"])
         if com.has_key("-g"):
             db.readGroupTable(com["-g"])
         else:
             db.noGroup()
     else:
-        if "--QRC" in com:
+        if com["--QRC"]=="1":
             QueryTreeSegment=Tree()
             collapse(db.tree,QueryTreeSegment)
             tabPrune=tabulatePrunedBranches(QueryTreeSegment)
@@ -316,7 +316,7 @@ if __name__=="__main__":
         #        i.name=NodeTaxonDB[i.name]
     #Put the correct proportion on each branches
     R=db.GetEntropies(q=com["-q"])
-    if "--QR" in com:
+    if com["--QR"]=="1":
         QRtree(db,R)
     #remove node Assigned
 
