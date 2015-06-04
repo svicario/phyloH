@@ -305,8 +305,8 @@ if __name__=="__main__":
             for c in node.get_children():
                 if not c.is_leaf():
                     Traverse(c)
-                    if NodeTaxonDB[c.name]==NodeTaxonDB[node.name]:
-                        NodeTaxonDB[c.name]=c.name
+                    #if NodeTaxonDB[c.name]==NodeTaxonDB[node.name]:
+                    #    NodeTaxonDB[c.name]=c.name
         
         Traverse(db.tree)
         #print taxDB["FJ402946.1.1211_U"]

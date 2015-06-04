@@ -104,7 +104,7 @@ def GraphFeatures2Itollabel(tree_obj,SN):
     D.update(A)
     D[1][0]=str(round(m,3))
     for n in tree_obj.traverse():
-        out.append("\t".join(map(str,[n.name,"range",n.img_style["hz_line_color"]," - ".join(D[n.img_style["hz_line_width"]])])))
+        out.append("\t".join(map(str,[n.name,"range",n._img_style["hz_line_color"]," - ".join(D[n._img_style["hz_line_width"]])])))
         if n in SN:
             out.append("\t".join([n.name,"clade","#00FFFF","Signif"]))
         else:
