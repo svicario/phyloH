@@ -250,11 +250,13 @@ class DBdata:
         countTable=zip([x.split('\t') for x in handle.readlines()])
         self.SeqName=countTable[0]
         self.countTable=numpy.array(zip(countTable[1:]))
-    def expandTable(self):
+    def expandTable(self, Groups=None):
+        if not Groups:
+            Groups=self.groups.items()
         self.itemTable=[]
         self.indexItemTable={'id':0,'sample':1,'group':2}
         for i in range(self.countTable.shape[0]):
-            for g,columns in self.groups.items():
+            for g,columns in Groups:
                 for c in columns:
                     self.itemTable+=self.countTable[i,c]*[[self.SeqName[i],c,g]]
         
