@@ -141,6 +141,28 @@ def SignFeature2Itol(SN):
         out.append("\t".join([i.name,"Signif","#00FFFF"]))
     return "\n".join(out)
 
+def makeHMTLDistMatrix(outdict,pattern, db):
+    Gdict=outdict[pattern]
+    l=len(db.groups)
+    outhtml="<table border='1'><tr><th></th>"
+    for gg in db.groups:
+        outhtml+="<th>"+gg+"</th>"
+    outhtml+="</tr>\n"
+    for g in db.groups:
+        outhtml+="<tr><th>"+g+"</th>"
+        temp=[x for x in Gdict if x[0]==g]
+        for gg in db.groups:
+            if (g,gg) in temp:
+                outhtml+="<td>"+str(Gdict[(g,gg)])+"</td>"
+            else:
+                outhtml+="<td></td>"
+        outhtml+="</tr>"
+    outhtml+="</table border='1'>"
+    return outhtml
+        
+    
+    
+    
 def makeHTMLTable(outdict,pattern, translator=None):
             from numpy import floor, log10
             def signif(x,ndigits=1):
@@ -176,7 +198,7 @@ def makeHTMLTable(outdict,pattern, translator=None):
             outhtml+="</tr></table>"
             return outhtml
 
-def makeXMLoutput(HS,HE,db,Names,P,countbyS, R, com):
+def makeXMLoutput(HS,HE,db,Names,P,countbyS, R, com, Gdict, HSgivenE):
     OUT="<res>\n"
     OUT+="<HSample>\n\t<Observed>"+str(HS)+"</Observed>\n\t<Diversity>"+str(exp(HS))+"</Diversity>\n</HSample>\n"
     OUT+="<HEnvironment>\n\t<Observed>"+str(HE)+"</Observed>\n\t<Diversity>"+str(exp(HE))+"</Diversity>\n</HEnvironment>\n"
@@ -207,7 +229,10 @@ def makeXMLoutput(HS,HE,db,Names,P,countbyS, R, com):
                 D=exp(R[label])
                 OUT+="\t<Diversity>"+str(D)+"</Diversity>\n"
                 outdict[label]["beta_Diversity"]=D
-                Cardinality=exp(HE)
+                if label.find("treeAndEnvironment")>-1:
+                    Cardinality=exp(HE)
+                elif label.find("SampleGivenEnvironment")>-1:
+                    Cardinality=exp(HSgivenE)
                 S=Diversity2Perc(D,Cardinality)
                 OUT+="\t<Percentage_Overlap>"+str(S)+"</Percentage_Overlap>\n"
                 outdict[label]["Percentage_Overlap"]=S
@@ -228,12 +253,15 @@ def makeXMLoutput(HS,HE,db,Names,P,countbyS, R, com):
         S=Diversity2Perc(D,Cardinality)
         OUT+="\t<Percentage_Overlap>"+str(S)+"</Percentage_Overlap>\n</MI_KL>\n"
         
-
+    OUT+="<PairwiseTurnover>\n"
+    for g, gg in Gdict:
+        OUT+="<Turnover pair='"+g+"_"+gg+"'>"+str(Gdict[(g,gg)])+"</Turnover>"
     OUT+="<Counts><Total>"+str(sum(countbyS))+"</Total></Counts>\n"
+    outdict["PairwiseTurnover"]=Gdict
     nomi=numpy.array(db.samplesNames)
     for g in db.groups:
         OUT+="<Samples group='"+g+"'>"+",".join(list(nomi[db.groups[g]]))+"</Samples>\n"
-
+    
     OUT+="</res>"
     handle=open(com["-o"]+".xml","w")
     handle.write(OUT)
@@ -299,6 +327,8 @@ def makeHMTLoutput(db,countbyS, HS, HE, R, com, outdict,call):
     outhtml+=makeHTMLTable(outdict,"MI_t",translator)
     outhtml+="<H3>Difference of each group from total: phylogenetic Kullback-Leiber distance between each group and the overall sample</H3>"
     outhtml+=makeHTMLTable(outdict,"KL_of_")
+    outhtml+="""<H3>Beta Diversity: Pairwise TurnOver </H3>"""
+    outhtml+=makeHMTLDistMatrix(outdict, "PairwiseTurnover",db)
     outhtml+="<H2>Venn diagram of the partitioning of the information across the three attributes present on each observation</H2>"
     outhtml+="N.B. 1)the diagram is not area-proportional. </p><p>2) E is always within S, given that each sample belong to only one environment type or sample group.</p>"
     outhtml+="<p>3)Hgamma=HalphabyEnvironment+Hbeta = H(T)=H(T|E)+I(T,E)</p>"
@@ -413,7 +443,7 @@ def makeITOLcall(NodeTaxonDB,com,SN, db):
     itol_exporter = test.get_itol_export()
     itol_exporter.set_export_param_value('format', 'svg')
     itol_exporter.set_export_param_value('rangesCover','clades')
-    itol_exporter.set_export_param_value('showInternalLabels','0')
+    itol_exporter.set_export_param_value('showInternalLabels','1')
     itol_exporter.set_export_param_value('colorBranches','1')
     itol_exporter.set_export_param_value('datasetList','dataset1')
     itol_exporter.export(com["-o"]+"BetaEtree.svg")
