@@ -182,6 +182,7 @@ def TreeKLOverall(t, table, groups, q=1, record=True, Perm=False):
             tag.append(sum(ta[g]))
     tag=numpy.array(tag)
     tatot=sum(ta)
+
     #print ta, tag, tatot
     for n in t.traverse():
         #n.a=n.a/totalcount
@@ -243,7 +244,10 @@ def TreeKL(t, table, groups, q=1,record=True, Perm=False, branchScore=True):
             tag.append(sum(ta[g]))
     tag=numpy.array(tag)
     tatot=sum(ta)
+    #print "tot in Tree"
     #print ta, tag, tatot
+    #print len(t)
+    #print set(table.keys()).difference(t.get_leaf_names())
     for n in t.traverse():
         #n.a=n.a/totalcount
         n.add_feature('atot',sum(n.a))
