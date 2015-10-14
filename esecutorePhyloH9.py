@@ -85,6 +85,7 @@ def tabulatePrunedBranches(recipient):
     if Out==header:
         Out=""
     return Out
+
 def QRdata(db):
     """
     function that modify sample an and group so to observe difference
@@ -135,7 +136,7 @@ def QRtree(db, R):
     R['HalphaBySamples']= 0
     
 if __name__=="__main__":
-    com={"-q":1, "-qt":None, "-x":"nexml","-R":"/opt/exp_soft/uniba/R/bin/","None":1, "--QR":"0","--QRC":"1"}
+    com={"-q":1, "-qt":None, "-x":"nexml","-R":"/opt/exp_soft/uniba/R/bin/","None":1, "--QR":"0","--QRC":"0"}
     count=1
     key=None
     for i in sys.argv:
@@ -217,8 +218,12 @@ if __name__=="__main__":
     countbyS=sum(db.countTable)
     HS=Hill(countbyS/float(sum(countbyS)),com["-q"])[0]
     countbyGroup=[]
+    HSgivenE=0
     for g in db.groups:
-        countbyGroup.append(sum(countbyS[db.groups[g]]))
+        countSgivenE=float(sum(countbyS[db.groups[g]]))
+        HSgivenEi=Hill(countbyS[db.groups[g]]/countSgivenE,com["-q"])[0]
+        countbyGroup.append(countSgivenE)
+        HSgivenE+=(countSgivenE/float(sum(countbyS)))*HSgivenEi
     HE=Hill([x/float(sum(countbyGroup)) for x in countbyGroup],com["-q"])[0]
 
     #Getting Significance
@@ -249,8 +254,48 @@ if __name__=="__main__":
     Names=i.keys()
     Names.sort()
     Names+=["HgammaFor_"+g for g in db.groups.keys()]
-
-    outdict=makeXMLoutput(HS,HE,db,Names,P,countbyS, R, com)
+    #Pairwise Comparison
+    oldgroups=db.groups
+    G=db.groups.keys()
+    Gdict={}
+    while G:
+        g=G.pop(0)
+        for gg in G:
+            db.groups={}
+            db.groups.update([(g,oldgroups[g]),(gg,oldgroups[gg])])
+            db.expandTable(Groups=[(g,oldgroups[g]),(gg,oldgroups[gg])])
+            rr=db.GetEntropies(q=com["-q"],record=False, Perm=False, branchScore=True)
+            counts=[sum(countbyS[oldgroups[g]]), sum(countbyS[oldgroups[gg]])]
+            HEpair=Hill([x/float(sum(counts)) for x in counts],com["-q"])[0]
+            print (counts)
+            print(HEpair)
+            Gdict[(g,gg)]=1-rr["MI_treeAndEnvironment"]/HEpair
+    Sdict={}
+    S=list(enumerate(db.samplesNames))
+    print db.groups
+    while S:
+        s=S.pop(0)
+        print s
+        for ss in S:
+            db.groups={}
+            db.groups.update([(s[1],[s[0]]),(ss[1],[ss[0]])])
+            print db.groups
+            db.expandTable(Groups=[(s[1],[s[0]]),(ss[1],[ss[0]])])
+            rr=db.GetEntropies(q=com["-q"], record=False, Perm=False, branchScore=True)
+            counts=[countbyS[s[0]], countbyS[ss[0]]]
+            HEpair=Hill([x/float(sum(counts)) for x in counts],com["-q"])[0]
+            print (counts)
+            print(HEpair)
+            Sdict[(s[1],ss[1])]=1-rr["MI_treeAndEnvironment"]/HEpair
+    out="\n".join(["\t".join([x[0][0],x[0][1],str(x[1])]) for x in Sdict.items()])
+    handle=open("TurnOverSample"+com["-o"]+".tab","w")
+    handle.write(out)
+    handle.close()
+        
+    db.groups=oldgroups
+    db.expandTable()
+    R=db.GetEntropies(q=com["-q"])
+    outdict=makeXMLoutput(HS,HE,db,Names,P,countbyS, R, com,Gdict, HSgivenE)
     
     if bool(int(com["-h"])):
         outhtml=makeHMTLoutput(db,countbyS, HS, HE, R, com, outdict,call)
@@ -320,9 +365,9 @@ if __name__=="__main__":
         QRtree(db,R)
     #remove node Assigned
 
-
     QueryTreeSegment=Tree()
     collapse(db.tree,QueryTreeSegment)
+
     tabPrune=tabulatePrunedBranches(QueryTreeSegment)
     if tabPrune:
         handle=open(com["-o"]+"_Collapsed.tab","w")
