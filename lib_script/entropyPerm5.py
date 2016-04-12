@@ -8,13 +8,15 @@ import math
 from numpy import array, random, dtype
 from utility import Table
 from DiversityTreeKLFabris import cleanTree, TreeKL
+from DiversityMatrixTreeKL import TreeExtractInfo, MatrixKL
 from ete2 import Tree
 from time import time
 from copy import deepcopy
-from Bio import AlignIO
+from Bio import AlignIO, Phylo
 #from ete2 import faces, NodeStyle
 import os
 import numpy
+from pandas import DataFrame,MultiIndex
 
 
 def Diversity2Perc(D, Cardinality,q=1):
@@ -183,10 +185,14 @@ class DBdata:
         Table.shape=row,col
         for i in S:
             Table[leaves[i[2]],sample[i[0]]]=int(i[1])
-        
         self.countTable=Table
     def readTree(self, filename, format=1):
         self.tree=Tree(filename, format)
+    def readTreePandas(self, filename):
+        self.tree=Phylo.read(filename, "newick")
+        self.TreeSummary=TreeExtractInfo(self.tree)
+        self.TreeStat={"ITEi":DataFrame(index=self.TreeSummary[-1].index, columns=[]),
+                       "ITSgivenEi":DataFrame(index=self.TreeSummary[-1].index, columns=[])}
     def readAlignment(self, filename):
         self.alignment=AlignIO.read(filename, 'fasta')
     def fromTree(self, filename,names,table, ambienti=2,replicates=2):
@@ -266,8 +272,7 @@ class DBdata:
         print D[0]
         self.indexID.update(D)
         #self.Nread=self.itemTable.shape[0]
-    def compressTable(self):
-        
+    def compressTable(self):        
         r, c=self.countTable.shape
         T=numpy.array(r*[c*[0]])
         ID=self.indexItemTable['id']
@@ -280,6 +285,30 @@ class DBdata:
         for i,name in zip(T,self.SeqName):
             table[name]=i
         return table
+    def GetEntropiesPandas(self, record=True, Perm=False, q=1, branchScore=True, Pairwise=False, EqualEffort=False):
+        #passare dall'itemtable alla tabella panda larga.
+        A=DataFrame(["\t".join(x) for x in self.itemTable])
+        AA=A.iloc[:,0].value_counts()
+        AAindex=[x.split("\t") for x in AA.index]
+        z=MultiIndex.from_tuples(AAindex, names=["Taxon","Sample","Group"])
+        AA.index=z
+        D=AA.unstack(level=0).transpose()
+        ch={}
+        ch.update(zip(map(str,range(len(self.samplesNames))),self.samplesNames))
+        D.rename(columns=ch,inplace=True)
+        #T=self.compressTable()
+        Depths, desc, L=self.TreeSummary
+        #print "UP",EqualEffort
+        H=MatrixKL(Depths, desc,L, D, Perm=Perm, Pairwise=Pairwise, EqualEffort=EqualEffort)
+        if Perm:
+            ITEi=H["ITEi"]
+            ITEi.name=len(self.TreeStat["ITEi"].columns)
+            ITSgivenEi=H["ITSgivenEi"]
+            ITSgivenEi.name=len(self.TreeStat["ITSgivenEi"].columns)
+            self.TreeStat["ITEi"]=self.TreeStat["ITEi"].join(DataFrame(ITEi))
+            self.TreeStat["ITSgivenEi"]=self.TreeStat["ITSgivenEi"].join(DataFrame(ITSgivenEi))
+        return H
+    
     def GetEntropies(self, record=True, Perm=False, q=1, branchScore=True):
         T=self.compressTable()
         groups={1:range(self.countTable.shape[1])}
@@ -359,6 +388,27 @@ class DBdata:
             self.itemTable[:,self.indexItemTable['id']]=S
             t1a=time()
             res+=[ self.GetEntropies(Perm=recordPerm,q=q)]
+            t1+=time()-t1a
+        
+        self.itemTable=OLD
+        sys.stdout.write('total time:'+str(time()-t0)+' time calculating:'+str(t1)+' time shuffling:'+str(t2)+'\n')
+        return res
+    def PermutationTestPandas(self, reps=100, recordPerm=True,q=1):
+        res=[]
+        t0=time()
+        OLD=deepcopy(self.itemTable)
+        t1=0
+        t2=0
+        for i in range(reps):
+            if i/100==i/100.0:
+                sys.stdout.write('iteration '+str(i)+'\n')
+            S=self.itemTable[:,self.indexItemTable['id']]
+            t2a=time()
+            numpy.random.shuffle(S)
+            t2+=time()-t2a
+            self.itemTable[:,self.indexItemTable['id']]=S
+            t1a=time()
+            res+=[ self.GetEntropiesPandas(Perm=recordPerm,q=q)]
             t1+=time()-t1a
         
         self.itemTable=OLD
