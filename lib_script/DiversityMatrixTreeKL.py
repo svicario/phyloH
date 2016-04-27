@@ -148,7 +148,7 @@ def MatrixKL(Depths, desc,L,D, Env=None, Perm=False, Pairwise=True, EqualEffort=
         Pise=1/(1.0*Pe[Dtree.columns.get_level_values("Group")].values)
         Pise=DataFrame(Pise, index=Tots.index, columns=Tots.columns)
         Pe=Pe/ns
-
+    
     #Frequency by group and nodes
     #note that only frequency calcualted from count is Pis
     #the other are derived such to use artificial Pe and Pise value for equal counts 
@@ -194,8 +194,8 @@ def MatrixKL(Depths, desc,L,D, Env=None, Perm=False, Pairwise=True, EqualEffort=
             for g in groupLevels:
                 Pisd=Pis[[G,g]]
                 Ped=Pe[[G,g]]/Pe[[G,g]].values.sum()
-                Pied=(Pisd*Pise[[G,g]]).sum(axis=1, level="Group").fillna(0)
-                Pid=(Pied*Ped.values[0]).sum(axis=1).fillna(0)
+                Pied=(Pisd*Pise[[G,g]].values[0]).sum(axis=1, level="Group").fillna(0)[[G,g]]
+                Pid=(Pied*Ped[[G,g]].values[0]).sum(axis=1).fillna(0)
                 Ted=(L.BL.values*Pied.transpose()).transpose().sum()
                 Td=(L.BL.values*Pid).sum()
                 HTd=ChaoShannon(Pid,L,Td).values.sum()
