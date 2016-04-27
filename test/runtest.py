@@ -104,7 +104,7 @@ db.readGroupTable(com["-g"])
 H=db.GetEntropiesPandas(q="1", Pairwise=0, EqualEffort=0)
 result=DataFrame.from_items([["Hgamma",[Hgamma,H["Hgamma"]]],
     ["Halpha",[Halpha,H["HalphaByEnvironment"]]],
-     ["Hbeta",[Hbeta,H["MI_treeAndSampleGivenEnvironment"]]],              
+     ["Hbeta",[Hbeta,H["MI_treeAndEnvironment"]]],              
     ["DistTurnover",[Hbeta/HE,H["DistTurnover"].loc["BB","AA"]]]],
     columns=["Test","RegularRoutine"],
     orient="index")
