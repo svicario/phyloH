@@ -1,29 +1,55 @@
 #GoodTest
 #Setting Test
 from Bio import Phylo
-from pandas import DataFrame
+from pandas import DataFrame, MultiIndex
 from numpy import random,array
+import scipy
 from collections import OrderedDict
 import sys
 sys.path.append('../')
 #esecutorePhyloHPandas = imp.load_source("esecutorePhyloHPandas","../esecutorePhyloHPandas.py")
 from esecutorePhyloHPandas import *
+from lib_script.DiversityMatrixTreeKL import *
 com={"-f":"Echinodermata.tree","-g":"GroupTest","-s":"sampleTest"}
+#Creating DataSet
+nsample=4
 t=Phylo.read(com["-f"], "newick")
 otu=[x.name for x in t.get_terminals()]
-countsA=random.random(len(otu))
-countsA=countsA/sum(countsA)
-countsB=random.random(len(otu))
-countsB=countsB/sum(countsB)
-freqE=random.random(1)[0]
-freqE=array([1-freqE,freqE])
-FullCounts=array([countsA,countsB]).transpose()*freqE
+#countsA=random.random(len(otu))
+#countsA=countsA/sum(countsA)
+#countsB=random.random(len(otu))
+#countsB=countsB/sum(countsB)
+FullCounts=scipy.stats.dirichlet.rvs([1]*len(otu),size=nsample)
+freqE=scipy.stats.dirichlet.rvs([1]*nsample,size=1)
+FullCounts=FullCounts.transpose()*freqE[0]
+#freqE=random.random(1)[0]
+#freqE=array([1-freqE,freqE])
+#FullCounts=array([countsA,countsB]).transpose()*freqE
 N=round(1/(FullCounts.min())+10,ndigits=-2)
 FullCounts=(FullCounts*N).astype("int")
-countsA=FullCounts[:,0]/float(sum(FullCounts[:,0]))
-countsB=FullCounts[:,1]/float(sum(FullCounts[:,1]))
-freqE=sum(FullCounts)/float(FullCounts.sum())
+#countsA1=FullCounts[:,0]
+#countsA2=FullCounts[:,1]
+#countsB1=FullCounts[:,2]
+#countsB2=FullCounts[:,3]
+freqE=sum(FullCounts)
 
+handle=open(com["-s"],"w")
+handle.write("\n".join(["\t".join(["A1",str(x[0]),x[1]]) for x in zip(FullCounts[:,0],otu)]))
+handle.write("\n")
+handle.write("\n".join(["\t".join(["A2",str(x[0]),x[1]]) for x in zip(FullCounts[:,1],otu)]))
+handle.write("\n")
+handle.write("\n".join(["\t".join(["B1",str(x[0]),x[1]]) for x in zip(FullCounts[:,2],otu)]))
+handle.write("\n")
+handle.write("\n".join(["\t".join(["B2",str(x[0]),x[1]]) for x in zip(FullCounts[:,3],otu)]))
+handle.close()
+handle=open(com["-g"],"w")
+handle.write("A1\tAA\nA2\tAA\nB1\tBB\nB2\tBB")
+handle.close()
+
+FullCounts=DataFrame(FullCounts, index=otu, columns=["A1","A2","B1","B2"])
+grouplevels=["AA","AA","BB","BB"]
+samplelevels=["A1","A2","B1","B2"]
+FullCounts.columns=MultiIndex.from_tuples(list(zip(grouplevels,samplelevels)),names=["Group","Sample"])
 def traversing(c,count=[0]):
      """
      Putting Names on internal nodes, starting on root with 'L0'
@@ -44,64 +70,84 @@ def traversingForDescendant(c, desc,anc=None):
          C=traversingForDescendant(C,desc,c.name)
      return c
 
-traversing(t.clade)
-A=DataFrame(countsA, index=otu)
-B=DataFrame(countsB, index=otu)
-desc=[]
-traversingForDescendant(t.clade,desc)
-Counts=[x[0:3]+[A.loc[x[3]].values.sum(),B.loc[x[3]].values.sum()] for x in desc]
-Name, anc,Is_leaf, freqA,freqB=zip(*Counts)
-Counts=DataFrame({"Name":Name, "Is_leaf":Is_leaf, "anc":anc, "freqA":freqA,"freqB":freqB}, index=Name)
+def UltraTreeTest(FullCounts, t, otu, Equal=False):
+    #freqS=FullCounts.sum(axis=0)/FullCounts.values.sum()
+    if not Equal:
+        freqS=FullCounts.sum(axis=0)/FullCounts.values.sum()
+        #freqE=FullCounts.sum(axis=1, level="Group").sum(axis=0)/FullCounts.values.sum()
+        FullCounts=FullCounts/FullCounts.sum(axis=0)
+    else:
+        FullCounts=FullCounts/FullCounts.sum(axis=0)
+        freqS=FullCounts.sum(axis=0)/FullCounts.values.sum()
+        #print freqS
+    traversing(t.clade,count=[0])
+    desc=[]
+    traversingForDescendant(t.clade,desc)
+    Counts=[x[0:3]+list(FullCounts.loc[x[3]].values.sum(axis=0)) for x in desc]
+    #Counts=[x[0:3]+[A.loc[x[3]].values.sum(),B.loc[x[3]].values.sum()] for x in desc]
+    Counts=DataFrame.from_records(Counts,columns=["Name","anc","Is_Leaf"]+FullCounts.columns.tolist())
+    Counts=Counts.set_index("Name")
+    #print Counts.columns
+    #Counts=DataFrame({"Name":Name, "Is_leaf":Is_leaf, "anc":anc, "freqA":freqA,"freqB":freqB}, index=Name)
+    
+    Depths=t.clade.depths()
+    D=[[x[0].name,x[1]] for x in Depths.items()]
+    Depths={}
+    Depths.update(D)
+    D=[[x[0],Depths.setdefault(Counts.loc[x[0]].anc,0),x[1]] for x in Depths.items()]
+    D.sort(key=lambda x: x[-1])
+    
+    from scipy.stats import entropy
+    OldDepthNode=0
+    Halphas=[]
+    Hgammas=[]
+    WindowSizes=[]
+    tots=[]
+    freqE=freqS.sum(axis=0, level="Group")
+    #print freqE 
+    for y in D:
+        name, DepthAnc, DepthNode=y
+        s=[x[0] for x in D if (min(x[-1], DepthNode)-max(x[1], OldDepthNode))>0]
+        if s:
+            WindowSizes.append(DepthNode-OldDepthNode)
+            OldDepthNode=DepthNode
+            temp=Counts.loc[s,FullCounts.columns.tolist()]
+            temp.columns=FullCounts.columns
+            tots.append(temp.sum())
+            tempa=(temp*freqS).sum(axis=1,level="Group")
+            Ha=[entropy(tempa.loc[:,x]) for x in tempa]
+            #Ha=[entropy(temp.sum(axis=1,level="Group").iloc[:,x].values) for x in range(2)]
+            Halphas.append((Ha*freqE).sum())
+            Hgammas.append(entropy((temp*freqS).values.sum(axis=1)))
+    
+    WindowSizes=array(WindowSizes)
+    Halpha=sum(array(Halphas)*WindowSizes)/sum(WindowSizes)
+    Hgamma=sum(array(Hgammas)*WindowSizes)/sum(WindowSizes)
+    Hbeta=Hgamma-Halpha
+    HE=entropy(freqE)
+    return Halpha,Hgamma,Hbeta,HE,tots
 
-Depths=t.clade.depths()
-D=[[x[0].name,x[1]] for x in Depths.items()]
-Depths={}
-Depths.update(D)
-D=[[x[0],Depths.setdefault(Counts.loc[x[0]].anc,0),x[1]] for x in Depths.items()]
-D.sort(key=lambda x: x[-1])
+Halpha,Hgamma,Hbeta,HE,tots=UltraTreeTest(FullCounts, t, otu)
 
-from scipy.stats import entropy
-OldDepthNode=0
-Halphas=[]
-Hgammas=[]
-WindowSizes=[]
-totAs=[]
-totBs=[]
-for y in D:
-    name, DepthAnc, DepthNode=y
-    s=[x[0] for x in D if (min(x[-1], DepthNode)-max(x[1], OldDepthNode))>0]
-    WindowSizes.append(DepthNode-OldDepthNode)
-    OldDepthNode=DepthNode
-    freqA=Counts.loc[s].freqA.values
-    freqB=Counts.loc[s].freqB.values
-    totAs.append(sum(freqA))
-    totBs.append(sum(freqB))
-    HA=entropy(freqA)
-    HB=entropy(freqB)
-    Halphas.append(HA*freqE[0]+HB*freqE[1])
-    Hgammas.append(entropy(freqA*freqE[0]+freqB*freqE[1]))
 
-WindowSizes=array(WindowSizes)
-Halpha=sum(array(Halphas)*WindowSizes)/sum(WindowSizes)
-Hgamma=sum(array(Hgammas)*WindowSizes)/sum(WindowSizes)
-Hbeta=Hgamma-Halpha
-HE=entropy(freqE)
- 
-
-handle=open("sampleTest","w")
-handle.write("\n".join(["\t".join(["A",str(x[0]),x[1]]) for x in zip(FullCounts[:,0],otu)]))
-handle.write("\n")
-handle.write("\n".join(["\t".join(["B",str(x[0]),x[1]]) for x in zip(FullCounts[:,1],otu)]))
-handle.close()
-handle=open("GroupTest","w")
-handle.write("A\tAA\nB\tBB")
-handle.close()
 
 db=DBdata()
 db.readTreePandas(com['-f'])
 db.readSampleTable(com["-s"])
 db.readGroupTable(com["-g"])
 H=db.GetEntropiesPandas(q="1", Pairwise=0, EqualEffort=0)
+result=DataFrame.from_items([["Hgamma",[Hgamma,H["Hgamma"]]],
+    ["Halpha",[Halpha,H["HalphaByEnvironment"]]],
+     ["Hbeta",[Hbeta,H["MI_treeAndEnvironment"]]],              
+    ["DistTurnover",[Hbeta/HE,H["DistTurnover"].loc["BB","AA"]]]],
+    columns=["Test","RegularRoutine"],
+    orient="index")
+result["Dif"]=result.Test-result.RegularRoutine
+print(result)
+
+H=db.GetEntropiesPandas(q="1", Pairwise=0, EqualEffort=1)
+#Halpha,Hgamma,Hbeta,HE=UltraTreeTest(countsA,countsB,[0.5,0.5])
+Halpha,Hgamma,Hbeta,HE,tots=UltraTreeTest(FullCounts, t, otu, Equal=True)
 result=DataFrame.from_items([["Hgamma",[Hgamma,H["Hgamma"]]],
     ["Halpha",[Halpha,H["HalphaByEnvironment"]]],
      ["Hbeta",[Hbeta,H["MI_treeAndEnvironment"]]],              
