@@ -10,46 +10,53 @@ sys.path.append('../')
 #esecutorePhyloHPandas = imp.load_source("esecutorePhyloHPandas","../esecutorePhyloHPandas.py")
 from esecutorePhyloHPandas import *
 from lib_script.DiversityMatrixTreeKL import *
-com={"-f":"Echinodermata.tree","-g":"GroupTest","-s":"sampleTest"}
-#Creating DataSet
-nsample=4
-t=Phylo.read(com["-f"], "newick")
-otu=[x.name for x in t.get_terminals()]
-#countsA=random.random(len(otu))
-#countsA=countsA/sum(countsA)
-#countsB=random.random(len(otu))
-#countsB=countsB/sum(countsB)
-FullCounts=scipy.stats.dirichlet.rvs([1]*len(otu),size=nsample)
-freqE=scipy.stats.dirichlet.rvs([1]*nsample,size=1)
-FullCounts=FullCounts.transpose()*freqE[0]
-#freqE=random.random(1)[0]
-#freqE=array([1-freqE,freqE])
-#FullCounts=array([countsA,countsB]).transpose()*freqE
-N=round(1/(FullCounts.min())+10,ndigits=-2)
-FullCounts=(FullCounts*N).astype("int")
-#countsA1=FullCounts[:,0]
-#countsA2=FullCounts[:,1]
-#countsB1=FullCounts[:,2]
-#countsB2=FullCounts[:,3]
-freqE=sum(FullCounts)
 
-handle=open(com["-s"],"w")
-handle.write("\n".join(["\t".join(["A1",str(x[0]),x[1]]) for x in zip(FullCounts[:,0],otu)]))
-handle.write("\n")
-handle.write("\n".join(["\t".join(["A2",str(x[0]),x[1]]) for x in zip(FullCounts[:,1],otu)]))
-handle.write("\n")
-handle.write("\n".join(["\t".join(["B1",str(x[0]),x[1]]) for x in zip(FullCounts[:,2],otu)]))
-handle.write("\n")
-handle.write("\n".join(["\t".join(["B2",str(x[0]),x[1]]) for x in zip(FullCounts[:,3],otu)]))
-handle.close()
-handle=open(com["-g"],"w")
-handle.write("A1\tAA\nA2\tAA\nB1\tBB\nB2\tBB")
-handle.close()
-
-FullCounts=DataFrame(FullCounts, index=otu, columns=["A1","A2","B1","B2"])
-grouplevels=["AA","AA","BB","BB"]
-samplelevels=["A1","A2","B1","B2"]
-FullCounts.columns=MultiIndex.from_tuples(list(zip(grouplevels,samplelevels)),names=["Group","Sample"])
+def CreatingDataset():
+    com={"-f":"Echinodermata.tree","-g":"GroupTest","-s":"sampleTest"}
+    #Creating DataSet
+    nsample=4
+    t=Phylo.read(com["-f"], "newick")
+    otu=[x.name for x in t.get_terminals()]
+    #countsA=random.random(len(otu))
+    #countsA=countsA/sum(countsA)
+    #countsB=random.random(len(otu))
+    #countsB=countsB/sum(countsB)
+    FullCounts=scipy.stats.dirichlet.rvs([1]*len(otu),size=nsample)
+    freqE=scipy.stats.dirichlet.rvs([1]*nsample,size=1)
+    FullCounts=FullCounts.transpose()*freqE[0]
+    #freqE=random.random(1)[0]
+    #freqE=array([1-freqE,freqE])
+    #FullCounts=array([countsA,countsB]).transpose()*freqE
+    N=round(1/(FullCounts.min())+10,ndigits=-2)
+    FullCounts=(FullCounts*N).astype("int")
+    #countsA1=FullCounts[:,0]
+    #countsA2=FullCounts[:,1]
+    #countsB1=FullCounts[:,2]
+    #countsB2=FullCounts[:,3]
+    freqE=sum(FullCounts)
+    
+    handle=open(com["-s"],"w")
+    handle.write("\n".join(["\t".join(["A1",str(x[0]),x[1]]) for x in zip(FullCounts[:,0],otu)]))
+    handle.write("\n")
+    handle.write("\n".join(["\t".join(["A2",str(x[0]),x[1]]) for x in zip(FullCounts[:,1],otu)]))
+    handle.write("\n")
+    handle.write("\n".join(["\t".join(["B1",str(x[0]),x[1]]) for x in zip(FullCounts[:,2],otu)]))
+    handle.write("\n")
+    handle.write("\n".join(["\t".join(["B2",str(x[0]),x[1]]) for x in zip(FullCounts[:,3],otu)]))
+    handle.close()
+    handle=open(com["-g"],"w")
+    handle.write("A1\tAA\nA2\tAA\nB1\tBB\nB2\tBB")
+    handle.close()
+    
+    FullCounts=DataFrame(FullCounts, index=otu, columns=["A1","A2","B1","B2"])
+    grouplevels=["AA","AA","BB","BB"]
+    samplelevels=["A1","A2","B1","B2"]
+    FullCounts.columns=MultiIndex.from_tuples(list(zip(grouplevels,samplelevels)),names=["Group","Sample"])
+    db=DBdata()
+    db.readTreePandas(com['-f'])
+    db.readSampleTable(com["-s"])
+    db.readGroupTable(com["-g"])
+    return FullCounts, t, otu, db
 def traversing(c,count=[0]):
      """
      Putting Names on internal nodes, starting on root with 'L0'
@@ -70,6 +77,30 @@ def traversingForDescendant(c, desc,anc=None):
          C=traversingForDescendant(C,desc,c.name)
      return c
 
+
+
+def GetFromFiles(com):
+    db=DBdata()
+    db.readTreePandas(com['-f'])
+    db.readSampleTable(com["-s"])
+    db.readGroupTable(com["-g"])
+    A=DataFrame(["\t".join(x) for x in db.itemTable])
+    AA=A.iloc[:,0].value_counts()
+    AAindex=[x.split("\t") for x in AA.index]
+    z=MultiIndex.from_tuples(AAindex, names=["Taxon","Sample","Group"])
+    AA.index=z
+    D=AA.unstack(level=0).transpose()
+    ch={}
+    ch.update(zip(map(str,range(len(db.samplesNames))),db.samplesNames))
+    D.rename(columns=ch,inplace=True)
+    #T=self.compressTable()
+    Depths, desc, L=db.TreeSummary
+    D.fillna(value=0,inplace=True)
+    zz=set(D.index.tolist())
+    for i in zz.symmetric_difference([x.name for x in db.tree.get_terminals()]):
+        D.loc[i]=[0]*D.shape[1]
+    return D, db.tree, D.index.tolist(), db
+
 def UltraTreeTest(FullCounts, t, otu, Equal=False):
     #freqS=FullCounts.sum(axis=0)/FullCounts.values.sum()
     if not Equal:
@@ -80,6 +111,7 @@ def UltraTreeTest(FullCounts, t, otu, Equal=False):
         FullCounts=FullCounts/FullCounts.sum(axis=0)
         freqS=FullCounts.sum(axis=0)/FullCounts.values.sum()
         #print freqS
+    
     traversing(t.clade,count=[0])
     desc=[]
     traversingForDescendant(t.clade,desc)
@@ -127,32 +159,51 @@ def UltraTreeTest(FullCounts, t, otu, Equal=False):
     HE=entropy(freqE)
     return Halpha,Hgamma,Hbeta,HE,tots
 
-Halpha,Hgamma,Hbeta,HE,tots=UltraTreeTest(FullCounts, t, otu)
 
 
 
-db=DBdata()
-db.readTreePandas(com['-f'])
-db.readSampleTable(com["-s"])
-db.readGroupTable(com["-g"])
-H=db.GetEntropiesPandas(q="1", Pairwise=0, EqualEffort=0)
-result=DataFrame.from_items([["Hgamma",[Hgamma,H["Hgamma"]]],
-    ["Halpha",[Halpha,H["HalphaByEnvironment"]]],
-     ["Hbeta",[Hbeta,H["MI_treeAndEnvironment"]]],              
-    ["DistTurnover",[Hbeta/HE,H["DistTurnover"].loc["BB","AA"]]]],
-    columns=["Test","RegularRoutine"],
-    orient="index")
-result["Dif"]=result.Test-result.RegularRoutine
-print(result)
+def Report(FullCounts, t, otu,db):
+    Halpha,Hgamma,Hbeta,HE,tots=UltraTreeTest(FullCounts, t, otu)
+    H=db.GetEntropiesPandas(q="1", Pairwise=0, EqualEffort=0)
+    result=DataFrame.from_items([["Hgamma",[Hgamma,H["Hgamma"]]],
+        ["Halpha",[Halpha,H["HalphaByEnvironment"]]],
+         ["Hbeta",[Hbeta,H["MI_treeAndEnvironment"]]],              
+        ["DistTurnover",[Hbeta/HE,H["DistTurnover"].iloc[1,0]]]],
+        columns=["Test","RegularRoutine"],
+        orient="index")
+    result["Dif"]=result.Test-result.RegularRoutine
+    print(result)
+    
+    H=db.GetEntropiesPandas(q="1", Pairwise=0, EqualEffort=1)
+    #Halpha,Hgamma,Hbeta,HE=UltraTreeTest(countsA,countsB,[0.5,0.5])
+    Halpha,Hgamma,Hbeta,HE,tots=UltraTreeTest(FullCounts, t, otu, Equal=True)
+    result=DataFrame.from_items([["Hgamma",[Hgamma,H["Hgamma"]]],
+        ["Halpha",[Halpha,H["HalphaByEnvironment"]]],
+         ["Hbeta",[Hbeta,H["MI_treeAndEnvironment"]]],              
+        ["DistTurnover",[Hbeta/HE,H["DistTurnover"].iloc[1,0]]]],
+        columns=["Test","RegularRoutine"],
+        orient="index")
+    result["Dif"]=result.Test-result.RegularRoutine
+    print(result)
+    return None
 
-H=db.GetEntropiesPandas(q="1", Pairwise=0, EqualEffort=1)
-#Halpha,Hgamma,Hbeta,HE=UltraTreeTest(countsA,countsB,[0.5,0.5])
-Halpha,Hgamma,Hbeta,HE,tots=UltraTreeTest(FullCounts, t, otu, Equal=True)
-result=DataFrame.from_items([["Hgamma",[Hgamma,H["Hgamma"]]],
-    ["Halpha",[Halpha,H["HalphaByEnvironment"]]],
-     ["Hbeta",[Hbeta,H["MI_treeAndEnvironment"]]],              
-    ["DistTurnover",[Hbeta/HE,H["DistTurnover"].loc["BB","AA"]]]],
-    columns=["Test","RegularRoutine"],
-    orient="index")
-result["Dif"]=result.Test-result.RegularRoutine
-print(result)
+
+if __name__ == '__main__':
+    com={"-k":0}
+    count=1
+    key=None
+    for i in sys.argv:
+        if i[0]=="-":
+            key=i
+            com[key]=None
+        elif key!=None:
+            com[key]=i
+            key=None
+    print com
+    if com.has_key("-f"):
+        print "Test from user supplied sample. DistTurnover is wrong if more than two environment are present"
+        FullCounts, t, otu,db=GetFromFiles(com)
+    else:
+        print "Test from Automatically generated data: 4 sample, two environments. Data from 4 identical dirichlets"
+        FullCounts, t, otu,db=CreatingDataset()
+    Report(FullCounts, t, otu,db)

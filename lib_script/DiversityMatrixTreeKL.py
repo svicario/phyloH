@@ -144,7 +144,8 @@ def MatrixKL(Depths, desc,L,D, Env=None, Perm=False, Pairwise=True, EqualEffort=
         Ps=DataFrame(Ps, index=Tots.columns, columns=Tots.index).transpose()
         Pe=Series(Dtree.columns.get_level_values("Group")).value_counts()
         Pe=DataFrame(Pe).transpose()
-        Pe.columns=Tote.columns
+        Pe=Pe[Tote.columns]
+        #Pe.columns=Tote.columns
         Pise=1/(1.0*Pe[Dtree.columns.get_level_values("Group")].values)
         Pise=DataFrame(Pise, index=Tots.index, columns=Tots.columns)
         Pe=Pe/ns
