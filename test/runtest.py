@@ -11,10 +11,9 @@ sys.path.append('../')
 from esecutorePhyloHPandas import *
 from lib_script.DiversityMatrixTreeKL import *
 
-def CreatingDataset():
+def CreatingDataset(nsample=4):
     com={"-f":"Echinodermata.tree","-g":"GroupTest","-s":"sampleTest"}
     #Creating DataSet
-    nsample=4
     t=Phylo.read(com["-f"], "newick")
     otu=[x.name for x in t.get_terminals()]
     #countsA=random.random(len(otu))
@@ -34,23 +33,23 @@ def CreatingDataset():
     #countsB1=FullCounts[:,2]
     #countsB2=FullCounts[:,3]
     freqE=sum(FullCounts)
+    grouplevels=["AA","BB"]*(nsample/2)
+    grouplevels.sort()
+    #grouplevels=["AA","AA","BB","BB"]
+    samplelevels=[y[0]+str(x+1) for x,y in zip(range(nsample/2)*2,grouplevels)]
     
     handle=open(com["-s"],"w")
-    handle.write("\n".join(["\t".join(["A1",str(x[0]),x[1]]) for x in zip(FullCounts[:,0],otu)]))
-    handle.write("\n")
-    handle.write("\n".join(["\t".join(["A2",str(x[0]),x[1]]) for x in zip(FullCounts[:,1],otu)]))
-    handle.write("\n")
-    handle.write("\n".join(["\t".join(["B1",str(x[0]),x[1]]) for x in zip(FullCounts[:,2],otu)]))
-    handle.write("\n")
-    handle.write("\n".join(["\t".join(["B2",str(x[0]),x[1]]) for x in zip(FullCounts[:,3],otu)]))
+    for i,name in enumerate(samplelevels):
+        handle.write("\n".join(["\t".join([name,str(x[0]),x[1]]) for x in zip(FullCounts[:,i],otu)]))
+        handle.write("\n")
     handle.close()
     handle=open(com["-g"],"w")
-    handle.write("A1\tAA\nA2\tAA\nB1\tBB\nB2\tBB")
+    handle.write("\n".join([x+"\t"+y for x,y in zip(samplelevels,grouplevels)]))
     handle.close()
     
-    FullCounts=DataFrame(FullCounts, index=otu, columns=["A1","A2","B1","B2"])
-    grouplevels=["AA","AA","BB","BB"]
-    samplelevels=["A1","A2","B1","B2"]
+    FullCounts=DataFrame(FullCounts, index=otu, columns=samplelevels)
+    #grouplevels=["AA","AA","BB","BB"]
+    #samplelevels=["A1","A2","B1","B2"]
     FullCounts.columns=MultiIndex.from_tuples(list(zip(grouplevels,samplelevels)),names=["Group","Sample"])
     db=DBdata()
     db.readTreePandas(com['-f'])
@@ -164,23 +163,25 @@ def UltraTreeTest(FullCounts, t, otu, Equal=False):
 
 def Report(FullCounts, t, otu,db):
     Halpha,Hgamma,Hbeta,HE,tots=UltraTreeTest(FullCounts, t, otu)
-    H=db.GetEntropiesPandas(q="1", Pairwise=0, EqualEffort=0)
+    H=db.GetEntropiesPandas(q="1", Pairwise=1, EqualEffort=0)
     result=DataFrame.from_items([["Hgamma",[Hgamma,H["Hgamma"]]],
         ["Halpha",[Halpha,H["HalphaByEnvironment"]]],
          ["Hbeta",[Hbeta,H["MI_treeAndEnvironment"]]],              
-        ["DistTurnover",[Hbeta/HE,H["DistTurnover"].iloc[1,0]]]],
+        ["DistTurnover",[Hbeta/HE,H["DistTurnover"].iloc[1,0]]],
+        ["DistTurnoverbySample",[Hbeta/HE,H["DistTurnoverBySample"].iloc[1,0]]]],
         columns=["Test","RegularRoutine"],
         orient="index")
     result["Dif"]=result.Test-result.RegularRoutine
     print(result)
     
-    H=db.GetEntropiesPandas(q="1", Pairwise=0, EqualEffort=1)
+    H=db.GetEntropiesPandas(q="1", Pairwise=1, EqualEffort=1)
     #Halpha,Hgamma,Hbeta,HE=UltraTreeTest(countsA,countsB,[0.5,0.5])
     Halpha,Hgamma,Hbeta,HE,tots=UltraTreeTest(FullCounts, t, otu, Equal=True)
     result=DataFrame.from_items([["Hgamma",[Hgamma,H["Hgamma"]]],
         ["Halpha",[Halpha,H["HalphaByEnvironment"]]],
          ["Hbeta",[Hbeta,H["MI_treeAndEnvironment"]]],              
-        ["DistTurnover",[Hbeta/HE,H["DistTurnover"].iloc[1,0]]]],
+        ["DistTurnover",[Hbeta/HE,H["DistTurnover"].iloc[1,0]]],
+        ["DistTurnoverbySample",[Hbeta/HE,H["DistTurnoverBySample"].iloc[1,0]]]],
         columns=["Test","RegularRoutine"],
         orient="index")
     result["Dif"]=result.Test-result.RegularRoutine
@@ -205,5 +206,5 @@ if __name__ == '__main__':
         FullCounts, t, otu,db=GetFromFiles(com)
     else:
         print "Test from Automatically generated data: 4 sample, two environments. Data from 4 identical dirichlets"
-        FullCounts, t, otu,db=CreatingDataset()
+        FullCounts, t, otu,db=CreatingDataset(nsample=2)
     Report(FullCounts, t, otu,db)
