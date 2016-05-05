@@ -1,0 +1,156 @@
+DATASET_SYMBOL
+#Symbol datasets allow the display of various symbols on the branches of the tree. For each node, one or more symbols can be defined.
+#Each symbol's color, size and position along the branch can be specified.
+
+#lines starting with a hash are comments and ignored during parsing
+#=================================================================#
+#                    MANDATORY SETTINGS                           #
+#=================================================================#
+#select the separator which is used to delimit the data below (TAB,SPACE or COMMA).This separator must be used throughout this file (except in the SEPARATOR line, which uses space).
+
+SEPARATOR COMMA
+
+#label is used in the legend table (can be changed later)
+DATASET_LABEL,"Contribution to Turnover"
+
+#dataset color (can be changed later)
+COLOR,#ffff00
+
+#=================================================================#
+#                    OPTIONAL SETTINGS                            #
+#=================================================================#
+
+#each dataset can have a legend, which is defined below
+#for each row in the legend, there should be one shape, color and label
+#shape should be a number between 1 and 5:
+#1: square
+#2: circle
+#3: star
+#4: right pointing triangle
+#5: left pointing triangle
+
+LEGEND_TITLE, Contribution to Turnover
+LEGEND_SHAPES,1,1,1,1,1,1,1,1,1,1
+LEGEND_COLORS,#FFF1A9,#FEE187,#FECA66,#FEAB49,#FD8C3C,#FC5B2E,#ED2E21,#D41020,#B00026,#800026
+LEGEND_LABELS,-4.8e-05_to_0.0048,0.0048_to_0.0096,0.0096_to_0.0144,0.0144_to_0.0192,0.0192_to_0.024,0.024_to_0.0288,0.0288_to_0.0336,0.0336_to_0.0384,0.0384_to_0.0432,0.0432_to_0.048
+
+#=================================================================#
+#     all other optional settings can be set or changed later     #
+#           in the web interface (under 'Datasets' tab)           #
+#=================================================================#
+
+#largest symbol will be displayed with this size, others will be proportionally smaller.
+MAXIMUM_SIZE,50
+
+
+#Internal tree nodes can be specified using IDs directly, or using the 'last common ancestor' method described in iTOL help pages
+#=================================================================#
+#       Actual data follows after the "DATA" keyword              #
+#=================================================================#
+#the following fields are required for each node:
+#ID,symbol,size,color,fill,position,label
+#symbol should be a number between 1 and 5:
+#1: rectangle
+#2: circle
+#3: star
+#4: right pointing triangle
+#5: left pointing triangle
+
+#size can be any number. Maximum size in the dataset will be displayed using MAXIMUM_SIZE, while others will be proportionally smaller
+#color can be in hexadecimal, RGB or RGBA notation. If RGB or RGBA are used, dataset SEPARATOR cannot be comma.
+#fill can be 1 or 0. If set to 0, only the outline of the symbol will be displayed.
+#position is a number between 0 and 1 and defines the position of the symbol on the branch (for example, position 0 is exactly at the start of node branch, position 0.5 is in the middle, and position 1 is at the end)
+
+DATA
+#Examples
+
+#internal node will have a red filled circle in the middle of the branch
+#9606|184922,2,10,#ff0000,1,0.5
+
+#node 100379 will have a blue star outline at the start of the branch, half the size of the circle defined above (size is 5 compared to 10 above)
+#100379,3,5,#0000ff,0,0
+#node 100379 will also have a filled green rectangle in the middle of the branch, same size as the circle defined above (size is 10)
+#100379,1,10,#00ff00,1,0.5
+Echinodermata,2,51.0,#800026,1,1,0.0432_to_0.048
+Irregularia,2,48.6663679814,#B00026,1,1,0.0384_to_0.0432
+Cucumariidae,2,24.3331839907,#FECA66,1,1,0.0096_to_0.0144
+Spatangidae,2,15.3525297789,#FEE187,1,1,0.0048_to_0.0096
+Ophiura_sarsi,2,15.3525297789,#FEE187,1,1,0.0048_to_0.0096
+Ophiuroidea,2,15.3525297789,#FEE187,1,1,0.0048_to_0.0096
+Ophiura_albida,2,15.3525297789,#FEE187,1,1,0.0048_to_0.0096
+Ophiura_texturata,2,15.3525297789,#FEE187,1,1,0.0048_to_0.0096
+L3,2,15.3525297789,#FEE187,1,1,0.0048_to_0.0096
+L60,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L61,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Amphilepis_norvegica,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L32,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L22,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L53,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L66,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Leptosynapta,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L14,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L65,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L54,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L1,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Amphiura_chiajei,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L13,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L12,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L2,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Marthasterias_glacialis,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L69,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Echinocyamus_pusillus,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L36,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L35,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L34,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Phyllophorus_pellucidus,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L18,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L19,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L20,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Asterias_rubens,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L67,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L64,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L7,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Cucumaria,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Ophiura_affinis,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Echinocardium,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L45,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Amphiura,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L46,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L47,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L23,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L58,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Amphipholis_squamata,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Echinocardium_cordatum,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L29,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L30,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Brissopsis_lyrifera,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L44,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Psammechinus_miliaris,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L40,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L39,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L38,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Echinocardium_flavescens,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L74,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Astropecten_irregularis,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L75,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L76,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Amphiura_filiformis,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L25,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L24,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Ophiura,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L10,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L9,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Echinocucumis_hispida,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Asteroidea,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L71,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L72,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Pedicellaster_typicus,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Trachythyone_elongata,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L4,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L78,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L79,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Luidia,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Echinoidea,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L16,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+Labidoplax_buskii,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048
+L0,2,0.0,#FFF1A9,1,1,-4.8e-05_to_0.0048

@@ -1,7 +1,14 @@
 import Itol,ItolExport
 import numpy
-from numpy import exp,arange
+from numpy import exp,arange,log
 from pandas import DataFrame, Series,MultiIndex, cut
+import os
+import sys
+if len(sys.argv)>1:
+    sep=os.sep
+    pathScript=os.path.dirname(os.path.abspath(sys.argv[0]))
+    pathAncillary=os.path.dirname(os.path.abspath(sys.argv[0]))+sep+"AncillaryFiles"+sep
+
 
 def AddTaxonomy(H, db, taxonomyfile):
     #Define reference taxonomy
@@ -97,7 +104,7 @@ def DecorateH(H, db, alpha=0.05, taxonomy=None):
         
         if n in namesTSgivenE:
             H[n]["TurnOver"]=H[n].nats/H["HSgivenE"]
-    print H["MI_treeAndEnvironment"]
+    #print H["MI_treeAndEnvironment"]
     H["MI"]=H["MI_treeAndEnvironment"].append(H["MI_treeAndSampleGivenEnvironment"])
     del H["MI_treeAndEnvironment"]
     del H["MI_treeAndSampleGivenEnvironment"]
@@ -113,9 +120,9 @@ def DecorateH(H, db, alpha=0.05, taxonomy=None):
     Levels=Counts.columns.levels
     Labels=Counts.columns.labels
     Levels=[[H["tot"]]]+[list(Levels[0])]+[H["tag"].values[0]]+[list(Levels[1])]+[list(Counts.values[0,Labels[1]])]
-    print Labels
+    #print Labels
     Labels=[len(Labels[0])*[0]]+[list(Labels[0])]+[list(Labels[0])]+[list(Labels[1])]+[list(Labels[1])]
-    print Labels,Levels
+    #print Labels,Levels
     COL=MultiIndex(levels=Levels, labels=Labels, names=["Total Counts","Group Name","Group Counts","Sample Name","Sample Counts"])
     CCounts=DataFrame([Counts.shape[0]*[""]], index=COL,columns=[""])
     H["counts"]=CCounts
@@ -162,8 +169,14 @@ def DecorateH(H, db, alpha=0.05, taxonomy=None):
     if taxonomy:
         NodeTaxonDB=AddTaxonomy(H, db,taxonomy)
         NodeTaxonDB=NodeTaxonDB[H["MIByBranch"].index.get_level_values("Name")]
+        print H["MIByBranch"].index
+        print NodeTaxonDB
         H["MIByBranch"].set_index(keys=NodeTaxonDB, append=True, inplace=True)
+        print H["MIByBranch"].index
         H["MIByBranch"].reorder_levels(["Taxonomy","Name","Is_Leaf"], axis=0)
+    else:
+        H["MIByBranch"].set_index(keys=Series(["Unknown"]*H["MIByBranch"].shape[0],name="Taxonomy"), append=True, inplace=True)
+        print H["MIByBranch"]
     H["MI_KL"]=DataFrame(H["MI_KL"], columns=["KullBack-Lieber(PG(i)||Ptot(i)"])
     H["MIByBranch"].sort(columns=("I(Ti,G)","TurnOver"),inplace=True,ascending=False)
 
@@ -196,12 +209,19 @@ def hsv2rgb (h, s,v):
     return CMD[i](v,p1,p2,p3)
 
 def ForITOL(H):
-    from matplotlib import pyplot as plt
-    import matplotlib
-    values, bins=cut(H["MIByBranch"]["I(Ti,G)"].TurnOver,bins=10, retbins=True)
-    cm = plt.get_cmap('YlOrRd')
-    z=arange(1,11,1)/10.
-    zz=Series([matplotlib.colors.rgb2hex(x).upper() for x in cm(z)], index=values.cat.categories)
+    NBINS=10
+    values, bins=cut(H["MIByBranch"]["I(Ti,G)"].TurnOver,bins=NBINS, retbins=True)
+    try:
+        from matplotlib import pyplot as plt
+        import matplotlib
+    except ImportError:
+        if NBINS==10:
+            zz=Series(["#FFF1A9", "#FEE187", "#FECA66", "#FEAB49", "#FD8C3C","#FC5B2E","#ED2E21", "#D41020", "#B00026", "#800026"], index=values.cat.categories)
+        else: raise ImportError
+    else:
+        cm = plt.get_cmap('YlOrRd')
+        z=arange(1,(NBINS+1),1)/float(NBINS)
+        zz=Series([matplotlib.colors.rgb2hex(x).upper() for x in cm(z)], index=values.cat.categories)
     XITOL=DataFrame({"branch name":list(values.index.get_level_values("Name")), "mode":"range","label":list(values.values), "color":zz[values]})
     H["MIByBranch"].loc[:,("I(Ti,G)","Color")]=zz[values].values
     #print "wwww"
@@ -229,7 +249,7 @@ def ForITOL(H):
     Pie.index.name=""
     #Transform in integer to do not upset ITOL
     HIST=(Pie*H["counts"].index.get_level_values("Total Counts")[0]).astype(int)
-    return XITOL, HIST,H
+    return XITOL, HIST,H,values.cat.categories.tolist()
 def secondaryOutput(H, db, com):
     DESC="\n".join([x[0]+"\t"+" ".join(x[1]) for x in db.TreeSummary[1]])
     handle=open(com["-o"]+"_descedant.csv","w")
@@ -237,11 +257,74 @@ def secondaryOutput(H, db, com):
     handle.close()
     for k in H:
         temp=H[k].to_csv(sep="\t")
-        handle=open(com["-o"]+"_"+k+".csv","w")
+        if (k=="MIByBranch"):
+            handle=open(com["-o"]+".mibybranch","w")
+        else:
+            handle=open(com["-o"]+"_"+k+".csv","w")
         handle.write(temp)
         handle.close()
-    
 def MakeHTML(H,com):
+    Titles={
+        "counts":["Experimental Design:","Counts of observations across groups and samples within groups"],
+        "ExperimentalDesign":["Entropy across samples, groups and samples within groups",
+                              "MaxDiversity gives the values for a maximally balanced experimental design"],
+        "Gammas":["Gamma diversities:",
+                  "Total entropy and diversity within each group and overall data",
+                  "Unit measure for Diversity is equivalent number of independent equi-abundant linneages"],
+        'Alphas':["Alpha diversities:",
+                  "Mean entropy and diversity within sample or group",
+                  "Unit measure for Diversity is equivalent number of independent equi-abundant linneages"],
+        "MI":["Beta diversity:",
+              "Information shared across Tree and Sample or Group vector expressed  as nats and turnover of linneage.",
+              "Turnover is the percentage of observations not shared across groups",
+              "Pvalue is computed with Permutation procedure"],
+        'MI_KL':["Difference of each group from total:",
+                 "phylogenetic Kullback-Leiber distance between each group and the overall data"],
+        'DistTurnover':["Pairwise TurnOver between groups"]    
+    }
+    def floater(x, perc=False):
+        from math import floor, log10
+        if perc:
+            x=100*x
+        if (x/2 == float(x)/2) and x>0:
+            temp= str(round(x, 2-int(floor(log10(x)))))
+        else:
+            temp= str(x)
+        if perc:
+            temp+="%"
+        return temp
+    def floaterPerc(x):
+        return floater(x,perc=True)
+    def Tagify(text, tag):
+        return "<"+tag+">"+text+"</"+tag+">"
+    htmltext=open(pathAncillary+sep+"Template.html","r").read()
+    GlobalStatistics=""
+    GlobalStatistics+=Tagify("The run call was:","H3")+Tagify(com["call"],"p")+"\n"
+    for k in ['counts', 'ExperimentalDesign', 'Gammas','Alphas', 'MI', 'MI_KL','DistTurnover']:
+        GlobalStatistics+=Tagify(Titles[k].pop(0),"H2")+"\n"
+        for title in Titles[k]:
+            GlobalStatistics+=Tagify(title,"p")+"\n"
+        print k
+        if k!="DistTurnover":
+            GlobalStatistics+=H[k].to_html(float_format=floater,na_rep="",formatters={"TurnOver": lambda x: floater(x,perc=True)})
+        else:
+            GlobalStatistics+=H[k].to_html(float_format=floaterPerc,na_rep="")
+    GlobalStatistics+="\n"
+    temp=zip(*H["MIByBranch"].index.tolist())
+    temp[0]=['<a name="'+x+'">'+x+'</a>' for x in temp[0]]
+    tempname=H["MIByBranch"].index.names
+    OUT=H["MIByBranch"]+0
+    OUT.index=MultiIndex.from_tuples(zip(*temp))
+    OUT.index.names=tempname
+    BranchStatistics=OUT.to_html(float_format=floater, formatters={("I(Ti,G)","TurnOver"): lambda x: floater(x,perc=True),
+        ("I(Ti,S|G)","TurnOver"): lambda x: floater(x,perc=True)}, escape=False)
+    htmltext=htmltext.format(BranchStatistics=BranchStatistics, GlobalStatistics=GlobalStatistics )
+    handle=open(com["-o"]+".html","w")
+    handle.write(htmltext)
+    handle.close()
+    return "bau"
+    
+def OLDMakeHTML(H,com):
     Titles={
         "counts":["Experimental Design:","Counts of observations across groups and samples within groups"],
         "ExperimentalDesign":["Entropy across samples, groups and samples within groups",
@@ -325,6 +408,54 @@ def MakeHTML(H,com):
     handle.write(HTMLout)
     handle.close()
     return HTMLout 
+
+def makeITOL3output(tree, XITOL, HIST, bins, com):
+    handle=open(com["-o"]+".TreeLabeled","w")
+    handle.write(tree.format("newick"))
+    handle.close()
+    histtxt=open(pathAncillary+"ITOLStackedHistogram.txt","r").read()
+    formatdict={
+        "Data":HIST.to_csv(header=False,sep=","),
+        "NomeRun":com["-o"],
+        "NumeroUnoRipetutoQuantiICampioni":",".join(["1"]*HIST.shape[1]),
+        "ColoriDelleCategorie": ",".join(HIST.columns.get_level_values("COLORS").tolist()).strip(),
+        "NomiDelleCategorie": ",".join(HIST.columns.get_level_values("LABELS").tolist())
+    }
+    histtxt=histtxt.format(**formatdict)
+    handle=open(pathAncillary+com["-o"]+"_tableHistXitol.txt","w")
+    handle.write(histtxt)
+    handle.close()
+    Size={}
+    bins=["_to_".join(x.split(", "))[1:-1] for x in bins]
+    Size.update([(y,str(log(x+1)*51/log(10))) for x,y in enumerate(bins)])
+    Circletxt=open(pathAncillary+"ITOLInternalNodeCircle.txt","r").read()
+    assert len(bins)==10, "Bins are expected to be 10, have you changed the number of the colors?"
+    temp=XITOL[XITOL.loc[:,"mode"]=="range"]
+    SS=zip(temp.index.tolist(),["2"]*temp.shape[0],[Size[x] for x in temp.label], temp.color, ["1"]*temp.shape[0],["1"]*temp.shape[0],temp.label)
+    formatdict={
+        "Data":"\n".join([",".join(x) for x in SS]),
+        "CUTBins":",".join(bins)
+    }
+    Circletxt=Circletxt.format(**formatdict)
+    handle=open(pathAncillary+com["-o"]+"_tableCircleXitol.txt","w")
+    handle.write(Circletxt)
+    handle.close()
+    import errno
+    import shutil
+    from shutil import ignore_patterns
+    def copyD(src, dest):
+        try:
+            shutil.copytree(src, dest, ignore=ignore_patterns('.py', 'specificfile.file'))
+        except OSError as e:
+            # If the error was caused because the source wasn't a directory
+            if e.errno == errno.ENOTDIR:
+                shutil.copy(src, dest)
+            else:
+                print('Directory not copied. Error: %s' % e)
+    copyD(pathAncillary+sep+"external",os.getcwd()+sep+"external")
+    copyD(pathAncillary+sep+"radial2.js",os.getcwd()+sep+"radial2.js")
+     
+    
     
 def makeITOLcall(tree,XITOL, HIST, com):
     handle=open(com["-o"]+".TreeLabeled","w")

@@ -1,0 +1,61 @@
+DATASET_MULTIBAR
+
+SEPARATOR COMMA
+
+#label is used in the legend table (can be changed later)
+DATASET_LABEL,example multi bar chart
+
+#dataset color (can be changed later)
+COLOR,#ff0000
+
+#define colors for each individual field column (use hexadecimal, RGB or RGBA notation; if using RGB/RGBA, COMMA cannot be used as SEPARATOR)
+FIELD_COLORS, {ColoriDelleCategorie}
+
+#field labels
+FIELD_LABELS,{NomiDelleCategorie}
+
+#=================================================================#
+#                    OPTIONAL SETTINGS                            #
+#=================================================================#
+
+#dataset scale: you can simply set the values where the scale will be drawn
+#DATASET_SCALE,2000,10000,20000
+#or you can specify value, label and color for each scale line (dash separated, format: VALUE-LABEL-COLOR) 
+#DATASET_SCALE,2000-2k line-#0000ff,10000-line at 10k-#ff0000,20000-3rd line-#00ff00
+
+
+LEGEND_TITLE,{NomeRun}
+LEGEND_SHAPES,{NumeroUnoRipetutoQuantiICampioni}
+LEGEND_COLORS,{ColoriDelleCategorie}
+LEGEND_LABELS,{NomiDelleCategorie}
+
+#=================================================================#
+#     all other optional settings can be set or changed later     #
+#           in the web interface (under 'Datasets' tab)           #
+#=================================================================#
+
+#maximum width
+#WIDTH,1000
+
+#left margin, used to increase/decrease the spacing to the next dataset. Can be negative, causing datasets to overlap.
+#MARGIN,0
+
+#always show internal values; if set, values associated to internal nodes will be displayed even if these nodes are not collapsed. It could cause overlapping in the dataset display.
+#SHOW_INTERNAL,0
+
+#bar height factor; Default bar height will be slightly less than the available space between leaves, but you can set a multiplication factor here to increase/decrease it (values from 0 to 1 will decrease it, values above 1 will increase it)
+#HEIGHT_FACTOR,1
+
+#Bars are aligned to the node lines by default. Using BAR_SHIFT, you can move them all up/down by a fixed amount
+#BAR_SHIFT,0
+
+#align individual fields; if set to 1, individual bar charts will not be stacked
+ALIGN_FIELDS,0
+
+#Internal tree nodes can be specified using IDs directly, or using the 'last common ancestor' method described in iTOL help pages
+#=================================================================#
+#       Actual data follows after the "DATA" keyword              #
+#=================================================================#
+DATA
+#ID1,value1,value2,value3
+{Data}

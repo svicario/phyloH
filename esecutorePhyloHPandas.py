@@ -1,5 +1,5 @@
 from lib_script.entropyPerm5 import *
-from lib_script.Decorators import DecorateH, ForITOL, MakeHTML,makeITOLcall,secondaryOutput
+from lib_script.Decorators import DecorateH, ForITOL, MakeHTML,makeITOLcall,secondaryOutput, makeITOL3output
 #from lib_script.graphic import *
 from StringIO import StringIO
 import copy
@@ -113,6 +113,9 @@ if __name__=="__main__":
         print spiegazione
         raise ImportError
     com["call"]=" ".join(sys.argv)
+    #print "LondonCalling"
+    #print sys.argv[0]
+    #print os.path.abspath(sys.argv[0])
     db=DBdata()
     db.readTreePandas(com['-f'])
     if com["--QR"]=="0":
@@ -154,9 +157,13 @@ if __name__=="__main__":
         pass
         #print H[k]
     HTMLout=MakeHTML(H,com)
-    buffITOL, buffHIST,H=ForITOL(H)
-    print H["MIByBranch"]
+    buffITOL, buffHIST,H, bins=ForITOL(H)
+    #print H["MIByBranch"].loc[:,("I(Ti,G)","Color")]
     secondaryOutput(H,db,com)
+    #print H["MIByBranch"].loc[:,("I(Ti,G)","Color")]
+    makeITOL3output(db.tree,buffITOL, buffHIST, bins, com)
+    #print H["MIByBranch"].loc[:,("I(Ti,G)","Color")]
+    
     #CallITOL for graph
-    makeITOLcall(db.tree,buffITOL, buffHIST, com)
+    #makeITOLcall(db.tree,buffITOL, buffHIST, com)
     
