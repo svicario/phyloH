@@ -318,96 +318,13 @@ def MakeHTML(H,com):
     OUT.index.names=tempname
     BranchStatistics=OUT.to_html(float_format=floater, formatters={("I(Ti,G)","TurnOver"): lambda x: floater(x,perc=True),
         ("I(Ti,S|G)","TurnOver"): lambda x: floater(x,perc=True)}, escape=False)
-    htmltext=htmltext.format(BranchStatistics=BranchStatistics, GlobalStatistics=GlobalStatistics )
+    
+    htmltext=htmltext.format(BranchStatistics=BranchStatistics, GlobalStatistics=GlobalStatistics,nameRun=com["-o"] )
     handle=open(com["-o"]+".html","w")
     handle.write(htmltext)
     handle.close()
     return "bau"
     
-def OLDMakeHTML(H,com):
-    Titles={
-        "counts":["Experimental Design:","Counts of observations across groups and samples within groups"],
-        "ExperimentalDesign":["Entropy across samples, groups and samples within groups",
-                              "MaxDiversity gives the values for a maximally balanced experimental design"],
-        "Gammas":["Gamma diversities:",
-                  "Total entropy and diversity within each group and overall data",
-                  "Unit measure for Diversity is equivalent number of independent equi-abundant linneages"],
-        'Alphas':["Alpha diversities:",
-                  "Mean entropy and diversity within sample or group",
-                  "Unit measure for Diversity is equivalent number of independent equi-abundant linneages"],
-        "MI":["Beta diversity:",
-              "Information shared across Tree and Sample or Group vector expressed  as nats and turnover of linneage.",
-              "Turnover is the percentage of observations not shared across groups",
-              "Pvalue is computed with Permutation procedure"],
-        'MI_KL':["Difference of each group from total:",
-                 "phylogenetic Kullback-Leiber distance between each group and the overall data"],
-        'DistTurnover':["Pairwise TurnOver between groups"]    
-    }
-    def floater(x, perc=False):
-        from math import floor, log10
-        if perc:
-            x=100*x
-        if (x/2 == float(x)/2) and x>0:
-            temp= str(round(x, 2-int(floor(log10(x)))))
-        else:
-            temp= str(x)
-        if perc:
-            temp+="%"
-        return temp
-    def floaterPerc(x):
-        return floater(x,perc=True)
-    def Tagify(text, tag):
-        return "<"+tag+">"+text+"</"+tag+">"
-    HTMLout="""<!DOCTYPE html><html>
-    <head>
-    <script type="text/javascript" src="https://raw.github.com/kmahelona/ipython_notebook_goodies/master/ipython_notebook_toc.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    </head>
-    <body>"""
-    HTMLout+=Tagify("Partitioning information in "+com["-o"],"h1")+"\n"
-    HTMLout+="""<h1 id="tocheading">Table of Contents</h1>
-<div id="toc"></div>
-
-"""
-    HTMLout+=Tagify("The run call was:","H3")+Tagify(com["call"],"p")+"\n"
-    for k in ['counts', 'ExperimentalDesign', 'Gammas','Alphas', 'MI', 'MI_KL','DistTurnover']:
-        HTMLout+=Tagify(Titles[k].pop(0),"H2")+"\n"
-        for title in Titles[k]:
-            HTMLout+=Tagify(title,"p")+"\n"
-        print k
-        if k!="DistTurnover":
-            HTMLout+=H[k].to_html(float_format=floater,na_rep="",formatters={"TurnOver": lambda x: floater(x,perc=True)})
-        else:
-            HTMLout+=H[k].to_html(float_format=floaterPerc,na_rep="")
-    HTMLout+="\n"
-    HTMLout+=Tagify("Per Node Statistics mapped on the phylogeny","H2")
-    HTMLout+=Tagify("Three types of data are shown on the tree:","p")
-    LIST=[]
-    LIST+=[Tagify("""The color of the branches cyan indicates a contribution to I(T,E)
-                 higher than the null distribution, while branches are black otherwise.""","li")]
-    LIST+=[Tagify("""The background of each branch is a gradient from yellow to red for
-                 increased contribution to I(T,E). For details look at the legend on the side""","li")]
-    LIST+=[Tagify("""Bar plot on each tips indicates the relative frequencies in each group""","li")]
-    HTMLout+=Tagify("\n".join(LIST),"ol")
-    HTMLout+=Tagify("""Look at the tree find an relevant branches and text search
-                    the label of the branch to access the correct row on the by node statistics table.""","p")
-    HTMLout+=Tagify("Go itol using the link to modify the tree, or use the itol table and the labelled tree to add further data set (i.e. taxonomic name)","p")
-    HTMLout+='<img src=".+" alt="some_text">'
-    HTMLout+=Tagify("Per Node Statistics in tabular format:","H2")
-    temp=zip(*H["MIByBranch"].index.tolist())
-    temp[0]=['<a name="'+x+'">'+x+'</a>' for x in temp[0]]
-    tempname=H["MIByBranch"].index.names
-    OUT=H["MIByBranch"]+0
-    OUT.index=MultiIndex.from_tuples(zip(*temp))
-    OUT.index.names=tempname
-    HTMLout+=OUT.to_html(float_format=floater, formatters={("I(Ti,G)","TurnOver"): lambda x: floater(x,perc=True),
-        ("I(Ti,S|G)","TurnOver"): lambda x: floater(x,perc=True)}, escape=False)
-    HTMLout+="</body></html>"
-    handle=open(com["-o"]+".html","w")
-    handle.write(HTMLout)
-    handle.close()
-    return HTMLout 
 
 def makeITOL3output(tree, XITOL, HIST, bins, com):
     handle=open(com["-o"]+".TreeLabeled","w")
@@ -422,7 +339,7 @@ def makeITOL3output(tree, XITOL, HIST, bins, com):
         "NomiDelleCategorie": ",".join(HIST.columns.get_level_values("LABELS").tolist())
     }
     histtxt=histtxt.format(**formatdict)
-    handle=open(pathAncillary+com["-o"]+"_tableHistXitol.txt","w")
+    handle=open(com["-o"]+"_tableHistXitol.txt","w")
     handle.write(histtxt)
     handle.close()
     Size={}
@@ -437,7 +354,7 @@ def makeITOL3output(tree, XITOL, HIST, bins, com):
         "CUTBins":",".join(bins)
     }
     Circletxt=Circletxt.format(**formatdict)
-    handle=open(pathAncillary+com["-o"]+"_tableCircleXitol.txt","w")
+    handle=open(com["-o"]+"_tableCircleXitol.txt","w")
     handle.write(Circletxt)
     handle.close()
     import errno

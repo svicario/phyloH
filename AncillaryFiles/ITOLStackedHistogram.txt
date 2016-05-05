@@ -3,7 +3,7 @@ DATASET_MULTIBAR
 SEPARATOR COMMA
 
 #label is used in the legend table (can be changed later)
-DATASET_LABEL,example multi bar chart
+DATASET_LABEL,Stacked Histogram of relative abundance per environment
 
 #dataset color (can be changed later)
 COLOR,#ff0000

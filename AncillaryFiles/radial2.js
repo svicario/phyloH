@@ -395,7 +395,7 @@ window.onload = function () {
     var fileInputTree = document.getElementById('fileInputTree');
     fileInputCSV.addEventListener('change', function(e) {
         var num_files = fileInputCSV.files.length;
-        if ( (num_files>0) && (fileInputCSV.files[0].name.indexOf('.csv')>-1) )
+        if ( (num_files>0) && (fileInputCSV.files[0].name.indexOf('.mibybranch')>-1) )
         {
             var file = fileInputCSV.files[0];
             var reader = new FileReader();
