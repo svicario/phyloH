@@ -12,6 +12,7 @@ from esecutorePhyloHPandas import *
 from lib_script.DiversityMatrixTreeKL import *
 
 def CreatingDataset(nsample=4):
+    N=1000000
     com={"-f":"Echinodermata.tree","-g":"GroupTest","-s":"sampleTest"}
     #Creating DataSet
     t=Phylo.read(com["-f"], "newick")
@@ -26,7 +27,9 @@ def CreatingDataset(nsample=4):
     #freqE=random.random(1)[0]
     #freqE=array([1-freqE,freqE])
     #FullCounts=array([countsA,countsB]).transpose()*freqE
-    N=round(1/(FullCounts.min())+10,ndigits=-2)
+    #TT=FullCounts.round(3)
+    #TT=FullCounts.applymap(lambda x: round(x,ndigits=3))
+    #N=round(1/(TT.min())+10,ndigits=-2)
     FullCounts=(FullCounts*N).astype("int")
     #countsA1=FullCounts[:,0]
     #countsA2=FullCounts[:,1]

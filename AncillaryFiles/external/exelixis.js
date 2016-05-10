@@ -14,7 +14,7 @@ var exeOpts = {
         },
         label : {
             fontsize : 12,
-            usePics : false, 
+            usePics : false,
             pics : {
                 pictureSource : pics,
                 pictureWidth : 0,
@@ -11432,7 +11432,8 @@ tree.label = function () {
         }
 
     label.display().call(this, node, layout_type)
-        .attr("class", "tnt_tree_label")
+        //.attr("class", "tnt_tree_label")
+        .classed("tnt_tree_label", true)
         .attr("transform", function (d) {
         var t = label.transform()(node, layout_type);
         return "translate (" + t.translate[0] + " " + t.translate[1] + ")rotate(" + t.rotate + ")";
@@ -11485,15 +11486,18 @@ tree.label.histogram = function () {
                 fill = opts.table_hist.colors[idx];
             }
         //var fl = (opts.histograms && opts.histograms.full_length) || 30;
-        var fl = (opts.tree.width/2)*0.15/opts.table_hist.colors.length;
-        // debugger;
+        var nRadius = parseFloat(document.getElementById("nRadius").value);
+        var fl = (opts.tree.width/2)*(1-nRadius-0.05)/opts.table_hist.colors.length;
+        fl *= (opts.table_hist && opts.table_hist.labelHistogramK)|| 1;
+        //debugger;
         l = d3.select(this)
             .append("rect")
             .attr("x", 0)
             .attr("y", 0)
             .attr("width", hist_length*fl)
             .attr("height", 10)
-            .attr("fill", fill);
+            .attr("fill", fill)
+            .classed("labelHistogram", true);
     } 
     else 
     {
@@ -11519,7 +11523,8 @@ tree.label.histogram = function () {
         if (layout_type === "radial") {
             // console.log(node.data())
             //layout.max_leaf_label_width();
-            var max_tree_radius = (opts.tree.width/2) * 0.8;
+            var nRadius = parseFloat(document.getElementById("nRadius").value);
+            var max_tree_radius = (opts.tree.width/2) * nRadius;
             t.translate[0] = max_tree_radius - d.y;
 
         }
@@ -11548,7 +11553,9 @@ tree.label.histogram = function () {
                 .style('visibility', 'hidden');
 
             //var fl = (opts.histograms && opts.histograms.full_length) || 30;
-            var fl = (opts.tree.width/2)*0.15/opts.table_hist.colors.length;
+            var nRadius = parseFloat(document.getElementById("nRadius").value);
+            var fl = (opts.tree.width/2)*(1-nRadius-0.05)/opts.table_hist.colors.length;
+            fl *= (opts.table_hist && opts.table_hist.labelHistogramK)|| 1;
             var hist = svg
                 .append("rect")
                 .attr("x", 0)
@@ -11859,7 +11866,9 @@ tree.layout = function () {
         opts.tree.max_y = y_root_dists[max_idx];
         opts.tree.max_leaf_label_width = this.max_leaf_label_width();
         //var fl = (opts.histograms && opts.histograms.full_length) || 30;
-        var fl = (opts.table_hist && (opts.tree.width/2)*0.2/opts.table_hist.colors.length) || 1;
+        var nRadius = parseFloat(document.getElementById("nRadius").value);
+        var fl = (opts.table_hist && (opts.tree.width/2)*(1-nRadius)/opts.table_hist.colors.length) || 1;
+        fl *= (opts.table_hist && opts.table_hist.labelHistogramK)|| 1;
         var n_hists = (opts.table_hist && opts.table_hist.colors.length) || 1;
         var delta = d3.round(max_root_dist*n_hists*fl/(opts.tree.width/2)*100)/100; //calcolo la proporzione
         /*
@@ -11935,21 +11944,24 @@ tree.layout.radial = function () {
 
     // Changes in width affect changes in r
     layout.width.transform (function (val) {
+        var nRadius = parseFloat(document.getElementById("nRadius").value);
         r = val / 2;
-        layout.cluster.size([360, r*0.8])
+        layout.cluster.size([360, r*nRadius])
         layout.translate_vis([r, r]);
         return val;
     });
 
     api.method ("yscale",  function (dists) {
+    var nRadius = parseFloat(document.getElementById("nRadius").value);
     return d3.scale.linear()
         .domain([0, d3.max(dists)])
-        .range([0, r*0.8]);
+        .range([0, r*nRadius]);
     });
 
     api.method ("adjust_cluster_size", function (params) {
     var r = (layout.width()/2);
-    layout.cluster.size([360, r*0.8]);
+    var nRadius = parseFloat(document.getElementById("nRadius").value);
+    layout.cluster.size([360, r*nRadius]);
     return layout;
     });
 
@@ -12277,7 +12289,7 @@ tnt.tree = function () {
 
     var menu = [
         {
-            title: 'Collapse/Expand clade',
+            title: 'Collassa/Espandi',
             action: function(elm, d, i) {
                 // console.log('Item #1 clicked!');
                 // console.log('The data for this circle is: ' + d);
@@ -12291,7 +12303,7 @@ tnt.tree = function () {
             }
         },
         {
-            title: 'Only descedant',
+            title: 'Nuova root',
             action: function(elm, d, i) {
                 
 
@@ -12334,7 +12346,7 @@ tnt.tree = function () {
                 }
                 var hist_info = parts.join('<br/>');
                 d['to_clipboard'] = to_clipboard.join(';');
-                var elem = '<div><b>'+ d.name + '</b><br/><i>Taxonomy:' + info.taxonomy + '</i><br/>' + hist_info + '</div>';
+                var elem = '<div><b>'+ d.name + '</b><br/><i>' + info.taxonomy + '</i><br/>' + hist_info + '</div>';
                 return elem;
             },
             action: function(elm, d, i) {
@@ -12390,8 +12402,9 @@ tnt.tree = function () {
     var max_leaf_label_length = function(tree) {
       var n_hists = (opts.table_hist && opts.table_hist.colors.length) || 1;
       //var fl = (opts.histograms && opts.histograms.full_length) || 30;
-      var fl = (opts.table_hist && (opts.tree.width/2)*0.15/opts.table_hist.colors.length) || 1; 
-      //var nRadius = parseInt(document.getElementById("nRadius").value);
+      var nRadius = parseFloat(document.getElementById("nRadius").value);
+      var fl = (opts.table_hist && (opts.tree.width/2)*(1-nRadius-0.05)/opts.table_hist.colors.length) || 1; 
+      fl *= (opts.table_hist && opts.table_hist.labelHistogramK)|| 1;
       return fl;
     };
 
@@ -12690,15 +12703,44 @@ tnt.tree = function () {
         .duration(conf.duration)
         .attr("transform", transform);
         
+        var nRadius = parseFloat(document.getElementById("nRadius").value);
         var root_node = d3.select(".root");
         root_node.append("circle")
                 .attr("x",opts.tree.width/2)
                 .attr("y",opts.tree.width/2)
-                .attr("r",((opts.tree.width/2)*0.8)+30)
+                .attr("r",((opts.tree.width/2)*nRadius)+30)
                 .attr("stroke", "black")
                 .attr("stroke-width",0.5)
                 .attr('fill', 'none');
     });
+
+     api.method('update_nodes', function () {
+            var tnt_tree_node = tnt.tree.node;
+            var node = d3
+                .selectAll("g.tnt_tree_node");
+
+            /*
+            // re-create all the nodes again
+            // node.selectAll("*").remove();
+            node
+                .each(function () {
+                    conf.node_display.reset.call(this);
+                });
+
+            node
+                .each(function (d) {
+                    //console.log(conf.node_display());
+                    conf.node_display.call(this, tnt_tree_node(d));
+                });
+            */
+            // re-create all the labels again
+            node
+                .each (function (d) {
+                    conf.label.call(this, tnt_tree_node(d), conf.layout.type, d3.functor(conf.node_display.size())(tnt_tree_node(d)));
+                });
+
+        });
+
     };
 
     // API
@@ -13373,7 +13415,7 @@ exe.createTree = function (opts) {
     tree.on_click(nodeEvent);
 
     tree(el);
-
+    
     return tree;
 } 
 
@@ -13434,6 +13476,22 @@ exe.updateTree = function(tree, opts) {
     tree.update();
 }
 
+exe.updateLabelHistogram = function (tree, opts) {
+  d3.selectAll(".labelHistogram").remove();
+  var parsedOpts = parseOpts(opts, savedOpts);
+
+  savedOpts = parsedOpts;
+
+  //var data = parsedOpts.tree.data;
+
+  //Create a label
+  var label;
+  label = createLabel(parsedOpts);
+
+  tree.label(label);
+  tree.update_nodes();
+};
+
 /**
 * @exports the functionalities
 */
@@ -13441,6 +13499,7 @@ exe.updateTree = function(tree, opts) {
 module.exports = {
     createTree : exe.createTree,
     updateTree : exe.updateTree,
+    updateLabelHistogram : exe.updateLabelHistogram,
 };
 
 

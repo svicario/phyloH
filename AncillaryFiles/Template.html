@@ -5,26 +5,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <link rel="stylesheet" href="external/d3-context-menu/css/d3-context-menu.css"/>
     </head>
-    <body><h1>Partitioning information in Nano</h1>
+    <body><h1>Partitioning information in {nameRun}</h1>
 <h1 id="tocheading">Table of Contents</h1>
 <div id="toc"></div>
 <div id="GlobalStatistics">{GlobalStatistics}</div>
-<div id="TreeStatistics">
 <H2>Per Node Statistics mapped on the phylogeny</H2>
-<p>
-		  <label for="nRadius" 
-		         style="display: inline-block; width: 240px; text-align: right">
-		         radius = <span id="nRadius-value">…</span>
-		  </label>
-		  <input type="range" min="1" max="15" id="nRadius"/>
+	
+		<div id="context-menu"></div>
+		<div id="root_chain"></div>
+		<div id="legend" style="width:100px;">Legend:<br> </div>
+		<p>
+Sliders changes radius size within which tree is drawn and zooming of histogram<br>
+		  <input type="range" min="0" max="1" value="0.8" step="0.1" id="nRadius">
+
+		  <input type="range" min="0" max="5" value="1" step="0.5" id="labelHistogramK">
 		</p>
 		<div id="uploadSectionDiv">
 		<input type="file" id="fileInputCSV" accept=".mibybranch"/>		
 		<input type="file" id="fileInputTree" disabled="disabled" accept=".TreeLabeled"/>
-		</div>		
-		<div id="context-menu"></div>
-		<div id="root_chain"></div>
-		<div id="legend" style="width:100px;">Legend:<br> </div>
+		</div>	
 		<div id="yourDiv"></div>
 		<div>
 			<textarea rows="10" cols="80" id="csv-area" style="width:100%;">
@@ -34,7 +33,6 @@
 		<script src="external/d3-context-menu/js/d3-context-menu.js"></script>
 		<script src="external/exelixis.js" charset="utf-8"></script>
 		<script src="radial2.js" charset="utf-8"></script>
-</div>
 <div id="BranchStatistics">{BranchStatistics}</div>
 	</body>
 </html>

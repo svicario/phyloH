@@ -4,9 +4,16 @@ var root_chain_svg;
 var createTree = exe.createTree;
 
 updateTree = exe.updateTree;
+updateLabelHistogram = exe.updateLabelHistogram;
 
-d3.select("#nRadius").on("input", function() {
-  updateCircleRadius(+this.value);
+d3.select("#nRadius").on("click", function() {
+  //updateCircleRadius(+this.value);
+  updateRadius(+this.value, tree, opts);
+});
+
+d3.select("#labelHistogramK").on("click", function() {
+    opts.table_hist.labelHistogramK = +this.value;
+    updateLabelHistogram(tree, opts);
 });
 
 d3.select("#save").on("click", function(){
@@ -42,8 +49,7 @@ d3.select("#save").on("click", function(){
 
 });
 
-updateCircleRadius(10);
-
+//updateCircleRadius(10);
 initHoverTooltip();
 
 testRootChain();
@@ -92,6 +98,7 @@ opts.root_chain = d3.select("#root_chain")
 
 tree = createTree(opts);
 
+updateRadius(0.8, tree, opts);
 //updateTree(tree,opts);
 json_to_newick = function (json) {
     function nested(nest)
@@ -250,7 +257,7 @@ parseXItol = function (lines) {
 
 parseCSV = function (lines) {
     var palette = ["#FF0000","#00FF00","#0000FF","#FF33CC","#996633","#00CC99","#CC6699","#009933"]
-    var table_hist = {"histograms":{}, 'labels':[], 'colors':[]};
+    var table_hist = {"histograms":{}, 'labels':[], 'colors':[], "labelHistogramK": 1.0};
     var xitol = {};
     var csv_line = {};
     var rel_freqs_indices = [];
@@ -476,6 +483,12 @@ function updateCircleRadius(nRadius) {
     // update the circle radius
     d3.selectAll("circle") 
         .attr("r", nRadius);
+}
+
+function updateRadius(nRadius, tree, opts) {
+    d3.select("#nRadius-value").text(nRadius);
+    d3.select("#nRadius").property("value", nRadius);
+    updateTree(tree, opts);
 }
 
 function initHoverTooltip() {
