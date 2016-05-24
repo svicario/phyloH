@@ -444,6 +444,11 @@ window.onload = function () {
                 console.log('Execution time load new tree: ' + time);
                 //debugger;
                 computeInnerLeavesHistograms(tree.data());
+
+                var inputTreeNameToSaveAs = document.getElementById("inputTreeNameToSaveAs");
+                inputTreeNameToSaveAs.disabled = false;
+                var saveTreeAsFileButton = document.getElementById("saveTreeAsFileButton");
+                saveTreeAsFileButton.disabled = false;
             }
             reader.readAsText(file);
         }
@@ -572,4 +577,38 @@ function testContextMenu()
                     console.log('closed!');
                 }
             })); // attach menu to element
+}
+
+function destroyClickedElement(event)
+{
+    document.body.removeChild(event.target);
+}
+
+
+function saveTreeAsFile()
+{
+    var treedata = opts.tree.data; //document.getElementById("inputTextToSave").value;
+    var treedataAsBlob = new Blob([treedata], {type:'text/plain'});
+    var treeNameToSaveAs = document.getElementById("inputTreeNameToSaveAs").value;
+
+    var downloadLink = document.createElement("a");
+    downloadLink.download = treeNameToSaveAs;
+    downloadLink.innerHTML = "Download File";
+    if (window.webkitURL != null)
+    {
+        // Chrome allows the link to be clicked
+        // without actually adding it to the DOM.
+        downloadLink.href = window.webkitURL.createObjectURL(treedataAsBlob);
+    }
+    else
+    {
+        // Firefox requires the link to be added to the DOM
+        // before it can be clicked.
+        downloadLink.href = window.URL.createObjectURL(treedataAsBlob);
+        downloadLink.onclick = destroyClickedElement;
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+    }
+
+    downloadLink.click();
 }

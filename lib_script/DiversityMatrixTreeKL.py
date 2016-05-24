@@ -40,6 +40,17 @@ def GetDepths(t):
     Depths=DataFrame.from_records(Depths)
     return Depths
 
+def TreeExtractInfoMultiple(t):
+    DepthsList=[]
+    descList=[]
+    LList=[]
+    for tt in t:
+        Depths, desc, L=TreeExtractInfo(t)
+        DepthsList.append(Depths)
+        descList.append(desc)
+        LList.append(L)
+    
+    return DepthsList, descList, LList
 def TreeExtractInfo(t):
     """
     Extracting Info from the tree to make statistics over matrix
@@ -53,7 +64,11 @@ def TreeExtractInfo(t):
     L.index=L.Name
     desc=zip(Name,descArr)
     return Depths, desc, L
-
+def TreeMatrixMultiple(DList,descList,LList, Env=None,DshapeLarge=True):
+    DtreeList=[]
+    for D,desc,L in zip(DList,descList,LList):
+        DtreeList.append(TreeMatrix(D,desc,L))
+    return DtreeList
 def TreeMatrix(D,desc,L, Env=None,DshapeLarge=True):
     """
     Applying tree information (desc,L) on a given count matrix (D) and columns grouping (Env) to obtain a matrix of count over the tree
@@ -111,13 +126,20 @@ def ChaoKL(P, Pbase,L,T, contribution=True):
         H=H.sum()
     return H
 
-
-def MatrixKL(Depths, desc,L,D, Env=None, Perm=False, Pairwise=True, EqualEffort=False):
+def MatrixMultiple(DtreeList,Perm, Pairwise, EqualEffort):
+    HList=[]
+    for Dtree in DtreeList:
+        HList.append(MatrixKL(Depths=None, desc=None,L=None,D=None, Perm=Perm, Pairwise=Pairwise, EqualEffort=EqualEffort, Dtree=Dtree))
+        del HList[-1]["ITEi"]
+        del HList[-1]["ITSgivenEi"]
+    return HList
+def MatrixKL(Depths, desc,L,D, Env=None, Perm=False, Pairwise=True, EqualEffort=False, Dtree=None):
     """
     Calculate phylogenetic entropy partitioning without correction
     """
     #Expand observation to nodes
-    Dtree=TreeMatrix(D=D, desc=desc,L=L,Env=Env)
+    if (not Dtree):
+        Dtree=TreeMatrix(D=D, desc=desc,L=L,Env=Env)
     
     #here something better should exist!! to get levels with a given name in ther order of the level
     groupLevels=list(Dtree.columns.levels[[x for x,y in enumerate(Dtree.columns.names) if y=="Group"][0]])

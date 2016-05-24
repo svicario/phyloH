@@ -7,7 +7,7 @@ import numpy
 import math
 from numpy import array, random, dtype
 from utility import Table
-from DiversityTreeKLFabris import cleanTree, TreeKL
+#from DiversityTreeKLFabris import cleanTree, TreeKL
 from DiversityMatrixTreeKL import TreeExtractInfo, MatrixKL
 from ete2 import Tree
 from time import time
@@ -188,6 +188,8 @@ class DBdata:
         self.countTable=Table
     def readTree(self, filename, format=1):
         self.tree=Tree(filename, format)
+    def readTreesPandasMultiple(self, filename):
+        self.trees=list(Phylo.parse(filename, "newick"))
     def readTreePandas(self, filename):
         self.tree=Phylo.read(filename, "newick")
         self.TreeSummary=TreeExtractInfo(self.tree)
