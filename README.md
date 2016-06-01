@@ -27,7 +27,10 @@ to obtain the help call
      -h 0 or 1         boolean to check if you want html output
      --QR              identify linneage present in the Query but not in the Reference (Need found observation to be tagged with "Query" prefix)
      --QRC             collapse branch with only query before analysis
+     -e   
   
+ run example using following call (for you Marica)
+ ../esecutorePhyloHPandas.py -f test/Echinodermata.tree -s test/sampleTest  -g test/GroupTest -q 1 -r 2 -o xxx -e 0 -k 0
  
  The script is exposed behind a webservice. For details visit https://www.biodiversitycatalogue.org/rest_methods/143
 
