@@ -501,6 +501,7 @@ class DBdata:
 #        
 #        return res
 def SelectNode(nodes):
+    #selezioni un nodo proporzionale alla lunghezza del ramo su cui insiste
     l=sum([x.dist for x in nodes])
     S=0
     r=numpy.random.random_sample()

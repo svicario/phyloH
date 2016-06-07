@@ -82,7 +82,7 @@ def QRtree(db, H):
     H["MI"].loc["I(T,S|E)"]["nats","TurnOver"]= temp["I(Ti,S|E)"]["nats","TurnOver"].sum()
 
 if __name__=="__main__":
-    com={"-x":"nexml","None":1, "--QR":"0","--QRC":"0","-k":0}
+    com={"-x":"nexml","None":1, "--QR":"0","--QRC":"0","-k":0, "-e":0,"-q":1,}
     count=1
     key=None
     for i in sys.argv:
