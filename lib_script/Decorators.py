@@ -116,7 +116,8 @@ def DecorateH(H, db, alpha=0.05, taxonomy=None):
     Counts.index.name=""
     Counts.index=[""]
     #Counts=Counts.swaplevel("Group","Sample",axis=1)
-    Counts.columns=Counts.columns.order()
+    NEWColumns=Counts.columns.sort_values()
+    Counts=Counts[NEWColumns]
     Levels=Counts.columns.levels
     Labels=Counts.columns.labels
     Levels=[[H["tot"]]]+[list(Levels[0])]+[H["tag"].values[0]]+[list(Levels[1])]+[list(Counts.values[0,Labels[1]])]
