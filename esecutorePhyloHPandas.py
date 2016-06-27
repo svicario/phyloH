@@ -120,6 +120,8 @@ if __name__=="__main__":
     db.readTreePandas(com['-f'])
     if com["--QR"]=="0":
         db.readSampleTable(com["-s"])
+        diffName=set(db.SeqName).difference([x.name for x in db.tree.get_terminals()])
+        assert diffName==set([]), "\n".join(["Following OTU are not present in the Tree",str(diffName)])
         if com.has_key("-g"):
             db.readGroupTable(com["-g"])
         else:

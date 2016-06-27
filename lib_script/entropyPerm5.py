@@ -16,7 +16,7 @@ from Bio import AlignIO, Phylo
 #from ete2 import faces, NodeStyle
 import os
 import numpy
-from pandas import DataFrame,MultiIndex
+from pandas import DataFrame,MultiIndex, crosstab
 
 
 def Diversity2Perc(D, Cardinality,q=1):
@@ -154,8 +154,25 @@ class DBdata:
             except KeyError:
                 self.groups[e]=[sample[s]]
         self.expandTable()
-        
     def readSampleTable(self,filename):
+        """
+        Sample file is a tabbed or space delimited table with 3 columns
+        In first case the columns are the following:
+        sample count Treeleaf
+        
+        combination sample and treeleaf not represented are considered count zero.
+ 
+        there should be only one instance of combination of  Treeleaf and samplenumber
+        A contingency table would be built based with one row for each Treeleaf and one columns for each sample, while several columns will belong to a given environment
+        """
+        D=DataFrame.from_csv(filename, header=None, index_col=None,sep="\t")
+        Dc=crosstab(D.iloc[:,0],D.iloc[:,2],values=D.iloc[:,1], aggfunc=sum)
+        Dc=Dc.transpose()
+        Dc.fillna(0,inplace=True)
+        self.samplesNames=Dc.columns.tolist()
+        self.SeqName=Dc.index.tolist()
+        self.countTable=Dc.values
+    def OLDreadSampleTable(self,filename):
         """
         Sample file is a tabbed or space delimited table with 3 columns
         In first case the columns are the following:
