@@ -120,9 +120,11 @@ def DecorateH(H, db, alpha=0.05, taxonomy=None):
     Counts=Counts[NEWColumns]
     Levels=Counts.columns.levels
     Labels=Counts.columns.labels
-    Levels=[[H["tot"]]]+[list(Levels[0])]+[H["tag"].values[0]]+[list(Levels[1])]+[list(Counts.values[0,Labels[1]])]
+    #Levels=[[H["tot"]]]+[list(Levels[0])]+[H["tag"].values[0]]+[list(Levels[1])]+[list(Counts.values[0,Labels[1]])]
+    Levels=[[H["tot"]]]+[list(Levels[0])]+[H["tag"].values[0]]+[list(Levels[1])]+[list(Counts.values)]
     #print Labels
-    Labels=[len(Labels[0])*[0]]+[list(Labels[0])]+[list(Labels[0])]+[list(Labels[1])]+[list(Labels[1])]
+    #Labels=[len(Labels[0])*[0]]+[list(Labels[0])]+[list(Labels[0])]+[list(Labels[1])]+[list(Labels[1])]
+    Labels=[len(Labels[0])*[0]]+[list(Labels[0])]+[list(Labels[0])]+[list(Labels[1])]+[range(Counts.shape[1])]
     #print Labels,Levels
     COL=MultiIndex(levels=Levels, labels=Labels, names=["Total Counts","Group Name","Group Counts","Sample Name","Sample Counts"])
     CCounts=DataFrame([Counts.shape[0]*[""]], index=COL,columns=[""])
