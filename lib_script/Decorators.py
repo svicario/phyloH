@@ -266,7 +266,7 @@ def secondaryOutput(H, db, com):
             handle=open(com["-o"]+"_"+k+".csv","w")
         handle.write(temp)
         handle.close()
-def MakeHTML(H,com):
+def MakeHTML(H,com, errormessage=None):
     Titles={
         "counts":["Experimental Design:","Counts of observations across groups and samples within groups"],
         "ExperimentalDesign":["Entropy across samples, groups and samples within groups",
@@ -303,6 +303,10 @@ def MakeHTML(H,com):
     htmltext=open(pathAncillary+sep+"Template.html","r").read()
     GlobalStatistics=""
     GlobalStatistics+=Tagify("The run call was:","H3")+Tagify(com["call"],"p")+"\n"
+    if errormessage:
+        GlobalStatistics+=Tagify("Errors", "H3")
+        for e in errormessage:
+            GlobalStatistics+=Tagify(e, "p")
     for k in ['counts', 'ExperimentalDesign', 'Gammas','Alphas', 'MI', 'MI_KL','DistTurnover']:
         GlobalStatistics+=Tagify(Titles[k].pop(0),"H2")+"\n"
         for title in Titles[k]:

@@ -120,8 +120,6 @@ if __name__=="__main__":
     db.readTreePandas(com['-f'])
     if com["--QR"]=="0":
         db.readSampleTable(com["-s"])
-        diffName=set(db.SeqName).difference([x.name for x in db.tree.get_terminals()])
-        assert diffName==set([]), "\n".join(["Following OTU are not present in the Tree",str(diffName)])
         if com.has_key("-g"):
             db.readGroupTable(com["-g"])
         else:
@@ -158,7 +156,12 @@ if __name__=="__main__":
     for k in ['counts', 'ExperimentalDesign', 'Gammas','Alphas', 'MI', 'MI_KL','DistTurnover']:
         pass
         #print H[k]
-    HTMLout=MakeHTML(H,com)
+    errormessage=[]
+    diffName=set(db.SeqName).difference([x.name for x in db.tree.get_terminals()])
+    if diffName:
+        errormessage.append("\n".join(["Following OTUs are not present in the Tree:",",".join(list(diffName))]))
+        print "Errore"
+    HTMLout=MakeHTML(H,com,errormessage=errormessage)
     buffITOL, buffHIST,H, bins=ForITOL(H)
     #print H["MIByBranch"].loc[:,("I(Ti,G)","Color")]
     secondaryOutput(H,db,com)
