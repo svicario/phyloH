@@ -159,7 +159,6 @@ def MatrixKL(Depths, desc,L,D, Env=None, Perm=False, Pairwise=True, EqualEffort=
     Pise=Tots/Tote[Dtree.columns.get_level_values("Group")].values
     #print "EqualEffort", EqualEffort
     if EqualEffort:
-        print "Leeeee"
         ng=len(groupLevels)
         ns=len(sampleLevels)
         Ps=ns*[1/float(ns)]
@@ -229,27 +228,35 @@ def MatrixKL(Depths, desc,L,D, Env=None, Perm=False, Pairwise=True, EqualEffort=
         if Pairwise:
             DistMatrix=DataFrame( columns=sampleLevels,index=sampleLevels)
             #make a copy
-            template=(Pis+0).fillna(0)
-            template.columns=template.columns.droplevel(level="Group")
+            template=DataFrame((Pis+0).fillna(0).values, index=Pis.index, columns=sampleLevels)
+            #template.columns=template.columns.droplevel(level="Group")
+            Etemplate=DataFrame((Ps+0).values, columns=sampleLevels)
+            #print Etemplate
             while sampleLevels:
                 S=sampleLevels.pop()
                 for s in sampleLevels:
-                    Pisd=template.ix[:,[S,s]]+0
+                    Pisd=template[[S,s]]
+                    Ped=Etemplate[[S,s]]
+                    #print "ciao"
+                    #print Ped.sum().sum()
+                    #print Ped
+                    Ped=Ped/Ped.sum().sum()
                     #print Pisd
-                    Ped=Ps+0
-                    Ped.columns=Ped.columns.droplevel(level="Group")
-                    Ped=Ped.loc[:,[S,s]]
+                    #Ped=Ps+0
+                    #Ped.columns=Ped.columns.droplevel(level="Group")
+                    #Ped=Ped[[S,s]]
                     #Ped=Pisd.sum(axis=0)
                     #Ped=Ped/sum(Ped)
                     #Pied=(Pisd*Pise[[G,g]]).sum(axis=1, level="Group").fillna(0)
                     #print Pisd
-                    #print Ped
+                    #print Pisd.shape, Ped.values
                     Pid=(Pisd*Ped.values[0]).sum(axis=1).fillna(0)
                     Tisd=(L.BL.values*Pisd.transpose()).transpose().sum()
                     Td=(L.BL.values*Pid).sum()
                     HTd=ChaoShannon(Pid,L,Td).values.sum()
                     HTgivenEd=(Ped*(ChaoShannon(Pisd,L,Tisd).sum())).values.sum()
                     hed=-(Ped*log(Ped)).fillna(value=0).values.sum()
+                    #print HTd,HTgivenEd,hed
                     DistMatrix.loc[S,s]=(HTd-HTgivenEd)/hed
             res["DistTurnoverBySample"]=DistMatrix 
     return res

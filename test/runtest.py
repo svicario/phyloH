@@ -165,26 +165,32 @@ def UltraTreeTest(FullCounts, t, otu, Equal=False):
 
 
 def Report(FullCounts, t, otu,db):
+    print "Unequal Effort"
     Halpha,Hgamma,Hbeta,HE,tots=UltraTreeTest(FullCounts, t, otu)
     H=db.GetEntropiesPandas(q="1", Pairwise=1, EqualEffort=0)
+    subFull=FullCounts.iloc[:,[0,1]]
+    subFull.columns.set_labels([0, 1], level=0,inplace=True)
+    Halpha_k,Hgamma_k,Hbeta_k,HE_k,tots_k=UltraTreeTest(subFull, t, otu)
     result=DataFrame.from_items([["Hgamma",[Hgamma,H["Hgamma"]]],
         ["Halpha",[Halpha,H["HalphaByEnvironment"]]],
          ["Hbeta",[Hbeta,H["MI_treeAndEnvironment"]]],              
         ["DistTurnover",[Hbeta/HE,H["DistTurnover"].iloc[1,0]]],
-        ["DistTurnoverbySample",[Hbeta/HE,H["DistTurnoverBySample"].iloc[1,0]]]],
+        ["DistTurnoverbySample",[Hbeta_k/HE_k,H["DistTurnoverBySample"].iloc[1,0]]]],
         columns=["Test","RegularRoutine"],
         orient="index")
     result["Dif"]=result.Test-result.RegularRoutine
     print(result)
     
+    print "Equal Effort"
     H=db.GetEntropiesPandas(q="1", Pairwise=1, EqualEffort=1)
     #Halpha,Hgamma,Hbeta,HE=UltraTreeTest(countsA,countsB,[0.5,0.5])
     Halpha,Hgamma,Hbeta,HE,tots=UltraTreeTest(FullCounts, t, otu, Equal=True)
+    Halpha_k,Hgamma_k,Hbeta_k,HE_k,tots_k=UltraTreeTest(subFull, t, otu, Equal=True)
     result=DataFrame.from_items([["Hgamma",[Hgamma,H["Hgamma"]]],
         ["Halpha",[Halpha,H["HalphaByEnvironment"]]],
          ["Hbeta",[Hbeta,H["MI_treeAndEnvironment"]]],              
         ["DistTurnover",[Hbeta/HE,H["DistTurnover"].iloc[1,0]]],
-        ["DistTurnoverbySample",[Hbeta/HE,H["DistTurnoverBySample"].iloc[1,0]]]],
+        ["DistTurnoverbySample",[Hbeta_k/HE_k,H["DistTurnoverBySample"].iloc[1,0]]]],
         columns=["Test","RegularRoutine"],
         orient="index")
     result["Dif"]=result.Test-result.RegularRoutine
@@ -193,7 +199,7 @@ def Report(FullCounts, t, otu,db):
 
 
 if __name__ == '__main__':
-    com={"-k":0}
+    com={"-k":1}
     count=1
     key=None
     for i in sys.argv:
@@ -208,6 +214,8 @@ if __name__ == '__main__':
         print "Test from user supplied sample. DistTurnover is wrong if more than two environment are present"
         FullCounts, t, otu,db=GetFromFiles(com)
     else:
-        print "Test from Automatically generated data: 4 sample, two environments. Data from 4 identical dirichlets"
-        FullCounts, t, otu,db=CreatingDataset(nsample=2)
+        nsample=4
+        mss="Test from Automatically generated data: {N} sample, two environments. Data from 4 identical dirichlets"
+        print mss.format(N=nsample)
+        FullCounts, t, otu,db=CreatingDataset(nsample=nsample)
     Report(FullCounts, t, otu,db)
