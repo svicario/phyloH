@@ -16,20 +16,23 @@ to obtain the help call
 "python esecutorePhyloH9.py"
 
 
-     -f filename       Use this file as the phylogeny file [phylo].
-     -o filename       Use this file to record output
-     -t filename       Use this file to get taxonomic information on some tips and map them in internal node
-     -s filename       Use this file as the sample file [sample].
-     -g filename       Use this file as the group file [group]
-     -r INT            Number of randomizations to use [999]
-     -q float          q parameter in the hill series (q=1 index is beta is Chao phylogenetic entropy, q=2 Rao phylogenetic diversity,q  zero is faith phylogenetic diversity)
-     -x string         two possible strings :"nexml" or "phyloxml" to select the xml output of the results
-     -h 0 or 1         boolean to check if you want html output
-     --QR              identify linneage present in the Query but not in the Reference (Need found observation to be tagged with "Query" prefix)
-     --QRC             collapse branch with only query before analysis
-     -e   
+     -f filename        Use this file as the phylogeny file [phylo].
+     -o filename        Use this file to record output
+     -t filename        Use this file to get taxonomic information on some tips and map them in internal node
+     -s filename        Use this file as the sample file [sample].If "-G 1" the file is a CSV that follow darwin archive standard and heading following TWDG
+     -g filename/string Use this file as the group file [group]/ if "-G 1" is a string that indicates the column in the CSV where to retrive groupping.
+     -r INT             Number of randomizations to use [999]
+     -x string          Two possible strings :"nexml" or "phyloxml" to select the xml output of the results
+     -h 0 or 1          Boolean to check if you want html output
+     --QR  0 or 1       Identify linneage present in the Query but not in the Reference (Need found observation to be tagged with "Query" prefix)
+     --QRC 0 or 1       Collapse branch with only query before analysis
+     -k    0 or 1       Perform pairwise comparison among all sample to explore variation across all data
+     -e    0 or 1       Assume that each sampling site have the same sampling effort. This option equalize the weigth of the different sample
+     --treesimplify     Collapse after analysis all descedant nodes that have weighted length to tips less that given [0.01]
+     -G    0 or 1       Geographic analysis mode: group and sample and potentially taxonomy  and tree are all embedded in a CSV that includes also geographical location of observations.
+ 
   
- run example using following call (for you Marica)
+ run example using following call 
  ../esecutorePhyloHPandas.py -f test/Echinodermata.tree -s test/sampleTest  -g test/GroupTest -q 1 -r 2 -o xxx -e 0 -k 0
  
  The script is exposed behind a webservice. For details visit https://www.biodiversitycatalogue.org/rest_methods/143

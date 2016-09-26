@@ -25,6 +25,8 @@ def AddTaxonomy(H, db, taxonomyfile):
     
     if taxDB.has_key(" "):
         del taxDB['']
+    if taxDB.has_key("_"):
+        del taxDB['_']
     #build node translation map
     NodeTaxonDB={}
     bad=[]
@@ -172,14 +174,18 @@ def DecorateH(H, db, alpha=0.05, taxonomy=None):
     if taxonomy:
         NodeTaxonDB=AddTaxonomy(H, db,taxonomy)
         NodeTaxonDB=NodeTaxonDB[H["MIByBranch"].index.get_level_values("Name")]
-        print H["MIByBranch"].index
-        print NodeTaxonDB
+        #print "Adding Taxonomy"
+        #print H["MIByBranch"].index
+        #print "sum"
+        #print H["MIByBranch"].sum()
         H["MIByBranch"].set_index(keys=NodeTaxonDB, append=True, inplace=True)
-        print H["MIByBranch"].index
+        #print H["MIByBranch"].sum()
+        #print H["MIByBranch"].index
         H["MIByBranch"].reorder_levels(["Taxonomy","Name","Is_Leaf"], axis=0)
+        #print H["MIByBranch"]
     else:
         H["MIByBranch"].set_index(keys=Series(["Unknown"]*H["MIByBranch"].shape[0],name="Taxonomy"), append=True, inplace=True)
-        print H["MIByBranch"]
+        #print H["MIByBranch"]
     H["MI_KL"]=DataFrame(H["MI_KL"], columns=["KullBack-Lieber(PG(i)||Ptot(i)"])
     H["MIByBranch"].sort(columns=("I(Ti,G)","TurnOver"),inplace=True,ascending=False)
 

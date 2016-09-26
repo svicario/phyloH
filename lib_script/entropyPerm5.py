@@ -169,8 +169,8 @@ class DBdata:
         Dc=crosstab(D.iloc[:,0],D.iloc[:,2],values=D.iloc[:,1], aggfunc=sum)
         Dc=Dc.transpose()
         Dc.fillna(0,inplace=True)
-        self.samplesNames=Dc.columns.tolist()
-        self.SeqName=Dc.index.tolist()
+        self.samplesNames=map(str,Dc.columns.tolist())
+        self.SeqName=map(str,Dc.index.tolist())
         self.countTable=Dc.values
     def OLDreadSampleTable(self,filename):
         """
@@ -433,7 +433,7 @@ class DBdata:
         self.itemTable=OLD
         sys.stdout.write('total time:'+str(time()-t0)+' time calculating:'+str(t1)+' time shuffling:'+str(t2)+'\n')
         return res
-    def Bootstrap(self, reps=100, recordPerm=True):
+    def BootstrapPandas(self, reps=100):
         res=[]
         t0=time()
         OLD=deepcopy(self.itemTable)
@@ -447,12 +447,14 @@ class DBdata:
             self.itemTable=OLD[INDEX,:]
             t2+=time()-t2a
             t1a=time()
-            res+=[ self.GetEntropies(Perm=False)]
+            temp=self.GetEntropiesPandas(Perm=False)
+            res.append([temp[x] for x in temp if x in ["Hgamma","HalphaByEnvironment","MI_treeAndEnvironment"] ])
             t1+=time()-t1a
         
         self.itemTable=OLD
+        Keys=["Hgamma","HalphaByEnvironment","MI_treeAndEnvironment"] 
         sys.stdout.write('total time:'+str(time()-t0)+' time calculating:'+str(t1)+' time resampling:'+str(t2)+'\n')
-        return res
+        return DataFrame(numpy.array(res), columns=Keys)
         
 ##    def PartionEntropy(self,S=None, entropyfunc=TreeKLCS ):
 ##        groups=True

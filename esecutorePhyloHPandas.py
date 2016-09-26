@@ -82,7 +82,7 @@ def QRtree(db, H):
     H["MI"].loc["I(T,S|E)"]["nats","TurnOver"]= temp["I(Ti,S|E)"]["nats","TurnOver"].sum()
 
 if __name__=="__main__":
-    com={"-x":"nexml","None":1, "--QR":"0","--QRC":"0","-k":0, "-e":0,"-q":1,}
+    com={"-x":"nexml","None":1, "--QR":"0","--QRC":"0","-k":0, "-e":0,"-q":1,"-G":0}
     count=1
     key=None
     for i in sys.argv:
@@ -94,26 +94,37 @@ if __name__=="__main__":
             key=None
     print com
     spiegazione=""" 
-     -f filename       Use this file as the phylogeny file [phylo].
-     -o filename       Use this file to record output
-     -t filename       Use this file to get taxonomic information on some tips and map them in internal node
-     -s filename       Use this file as the sample file [sample].
-     -g filename       Use this file as the group file [group]
-     -r INT            Number of randomizations to use [999]
-     -x string         two possible strings :"nexml" or "phyloxml" to select the xml output of the results
-     -h 0 or 1         boolean to check if you want html output
-     --QR  0 or 1      identify linneage present in the Query but not in the Reference (Need found observation to be tagged with "Query" prefix)
-     --QRC 0 or 1      collapse branch with only query before analysis
-     -k    0 or 1              perform pairwise comparison among all sample to explore variation across all data
-     -e    0 or 1            Assume that each sampling site have the same sampling effort. This option equalize the weigth of the different sample
-     --treesimplify    collapse after analysis all descedant nodes that have weighted length to tips less that given [0.01] 
+     -f filename        Use this file as the phylogeny file [phylo].
+     -o filename        Use this file to record output
+     -t filename        Use this file to get taxonomic information on some tips and map them in internal node
+     -s filename        Use this file as the sample file [sample].If "-G 1" the file is a CSV that follow darwin archive standard and heading following TWDG
+     -g filename/string Use this file as the group file [group]/ if "-G 1" is a string that indicates the column in the CSV where to retrive groupping.
+     -r INT             Number of randomizations to use [999]
+     -x string          Two possible strings :"nexml" or "phyloxml" to select the xml output of the results
+     -h 0 or 1          Boolean to check if you want html output
+     --QR  0 or 1       Identify linneage present in the Query but not in the Reference (Need found observation to be tagged with "Query" prefix)
+     --QRC 0 or 1       Collapse branch with only query before analysis
+     -k    0 or 1       Perform pairwise comparison among all sample to explore variation across all data
+     -e    0 or 1       Assume that each sampling site have the same sampling effort. This option equalize the weigth of the different sample
+     --treesimplify     Collapse after analysis all descedant nodes that have weighted length to tips less that given [0.01]
+     -G    0 or 1       Geographic analysis mode: group and sample and potentially taxonomy  and tree are all embedded in a CSV that includes also geographical location of observations.
      
     """
-    if (( (com["--QR"]=="0") and (not '-s' in com) ) | (not '-f' in com )):
+    if (( (com["--QR"]=="0") and (not '-s' in com) ) | ((not '-f' in com ) and  (com["-G"]=="0"))):
         print spiegazione
         raise ImportError
     com["call"]=" ".join(sys.argv)
-    #print "LondonCalling"
+    if com["-G"]=="1":
+        from lib_script.geoAddOn import *
+        makePhyloHInput(csv=com["-s"],sep=",", groupBy=[com["-g"]],  shape=False, makePhyloTaxo=(not com.has_key("-f")))
+        namefile=".".join(com["-s"].split("/")[-1].split(".")[:-1])
+        com["-g"]="Group_"+ com["-g"]
+        com["-s"]="Sample"
+        if not com.has_key("-t"):
+            com["-t"]=namefile+".taxonomy"
+        if not com.has_key("-f"):
+            com["-f"]=namefile+".tree"
+    print com
     #print sys.argv[0]
     #print os.path.abspath(sys.argv[0])
     db=DBdata()
@@ -171,4 +182,6 @@ if __name__=="__main__":
     
     #CallITOL for graph
     #makeITOLcall(db.tree,buffITOL, buffHIST, com)
+    if com["-G"]=="1":
+        makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=True,prefix=com["-o"])
     
