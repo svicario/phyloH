@@ -6,7 +6,7 @@ The script estimate the phylogenetic entropy and the phylogenetic mutual informa
 The script user the API https://github.com/albertyw/itol-api to load the reference 
 tree and the estimate of entropy and mutual information on itol web site (http://itol.embl.de/) and produce an output.
 
-With Complements to: [ETE2 python library](http://pythonhosted.org/ete2/),[iTOL (Interactive Tree of Life)](http://itol.embl.de/), [Python API for the Interactive Tree of Life ](https://github.com/albertyw/itol-api), [numpy](http://www.numpy.org/),[scipy](http://www.scipy.org/), [Biopython](http://biopython.org/wiki/Main_Page)
+With Complements to: [Bio python library](http://biopython.org/),[iTOL (Interactive Tree of Life)](http://itol.embl.de/), [Python API for the Interactive Tree of Life ](https://github.com/albertyw/itol-api), [numpy](http://www.numpy.org/),[scipy](http://www.scipy.org/), [Biopython](http://biopython.org/wiki/Main_Page), [pandas python library](http://pandas.pydata.org/),[GRASS](https://grass.osgeo.org/), [exelixis](https://github.com/daviddao/exelixis)
 ###RUNNING FROM COMMAND LINE
 python esecutorePhyloHPandas.py [-option] [value]
 
