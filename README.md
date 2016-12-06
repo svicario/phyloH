@@ -10,10 +10,10 @@ With Complements to: [ETE2 python library](http://pythonhosted.org/ete2/),[iTOL 
 ###RUNNING FROM COMMAND LINE
 python esecutorePhyloHPandas.py [-option] [value]
 
-option -s, -r  are mandatory
-if -G 0 then also -f -g are mandatory
--H is read only if -G 1 
--M is read only if -G 1 and -H different from zero
+option -s, -r  are mandatory  
+if -G 0 then also -f -g are mandatory  
+-H is read only if -G 1  
+-M is read only if -G 1 and -H different from zero  
 
 to obtain the help call
 "python esecutorePhyloHPandas.py"
