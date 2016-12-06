@@ -293,6 +293,8 @@ def MakeHTML(H,com, errormessage=None):
     }
     def floater(x, perc=False):
         from math import floor, log10
+        if numpy.abs(x)==numpy.inf:
+			return "Inf"
         if perc:
             x=100*x
         if (x/2 == float(x)/2) and x>0:
@@ -383,7 +385,7 @@ def makeITOL3output(tree, XITOL, HIST, bins, com):
             else:
                 print('Directory not copied. Error: %s' % e)
     copyD(pathAncillary+sep+"external",os.getcwd()+sep+"external")
-    copyD(pathAncillary+sep+"radial2.js",os.getcwd()+sep+"radial2.js")
+    copyD(pathAncillary+sep+"PhyloCommunity.js",os.getcwd()+sep+"PhyloCommunity.js")
      
     
     

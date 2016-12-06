@@ -147,7 +147,7 @@ class DBdata:
         assert len(sample)>1
         s=open(filename,'r').readlines()
         S=[x.split() for x in s]
-        assert len(set(S[0]))==len(S[0])
+        #assert len(set(S[0]))==len(S[0])
         for s, e in S:
             try:
                 self.groups[e].append(sample[s])

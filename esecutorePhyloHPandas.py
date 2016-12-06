@@ -82,7 +82,7 @@ def QRtree(db, H):
     H["MI"].loc["I(T,S|E)"]["nats","TurnOver"]= temp["I(Ti,S|E)"]["nats","TurnOver"].sum()
 
 if __name__=="__main__":
-    com={"-x":"nexml","None":1, "--QR":"0","--QRC":"0","-k":0, "-e":0,"-q":1,"-G":0}
+    com={"-x":"nexml","None":1, "--QR":"0","--QRC":"0","-k":0, "-e":0,"-q":1,"-G":0,"-H":0,"-g":"locationID"}
     count=1
     key=None
     for i in sys.argv:
@@ -108,7 +108,8 @@ if __name__=="__main__":
      -e    0 or 1       Assume that each sampling site have the same sampling effort. This option equalize the weigth of the different sample
      --treesimplify     Collapse after analysis all descedant nodes that have weighted length to tips less that given [0.01]
      -G    0 or 1       Geographic analysis mode: group and sample and potentially taxonomy  and tree are all embedded in a CSV that includes also geographical location of observations.
-     
+     -H    INT          If data are Geographic, group observation by hexagonal grid of a given span in meters, if zero no gridding is applied and locationID parameters is expected
+     -M    string       Cross obseration with a shapecollection  -G need to be 1 and -H need to be 0
     """
     if (( (com["--QR"]=="0") and (not '-s' in com) ) | ((not '-f' in com ) and  (com["-G"]=="0"))):
         print spiegazione
@@ -116,11 +117,34 @@ if __name__=="__main__":
     com["call"]=" ".join(sys.argv)
     if com["-G"]=="1":
         from lib_script.geoAddOn import *
-        makePhyloHInput(csv=com["-s"],sep=",", groupBy=[com["-g"]],  shape=False, makePhyloTaxo=(not com.has_key("-f")))
-        namefile=".".join(com["-s"].split("/")[-1].split(".")[:-1])
-        com["-g"]="Group_"+ com["-g"]
+        if com["-H"]==0:
+            if "-M" in com:
+                if com["-M"]=="TNC":
+                    if com["-g"].lower() in ["biomes", "major_habitat_type"]: com["-g"]="WWF_MHTNAM"
+                    if com["-g"].lower() in ["biogeographic_region", "realm"]: com["-g"]="WWF_REALM2"
+                    ShapeLoader(shapeName="terr-ecoregions-TNC/tnc_terr_ecoregions",samplefilename=com["-s"],pathPythonScript=com["call"].split(" ")[0], group=com["-g"])
+                    IN=os.path.dirname(os.path.abspath(com["-s"]))+os.path.sep+"grid_"+os.path.basename(com["-s"])
+                    sample,groupBy=makePhyloHInput(csv=IN,sep=",", groupBy=com["-g"],  shape=False, makePhylo=("-f" not in com),  makeTaxo=("-t" not in com))
+                    print ("Sample", sample, groupBy)
+                    com["-g"]="Group_"+com["-g"]
+                    com["-s"]="Sample"
+                    com["sample"]=sample
+                    com["groupBy"]=groupBy
+            else:
+                sample,groupBy=makePhyloHInput(csv=com["-s"],sep=",", groupBy=com["-g"],  shape=False, makePhylo=("-f" not in com),  makeTaxo=("-t" not in com))
+                com["-g"]="Group_"+ groupBy
+                com["sample"]=sample
+                com["groupBy"]=groupBy
+        else:
+            GridMaker(com["-s"],com["-H"], com["call"].split(" ")[0])
+            IN=os.path.dirname(os.path.abspath(com["-s"]))+os.path.sep+"grid_"+os.path.basename(com["-s"])
+            sample,groupBy=makePhyloHInput(csv=IN,sep=",", groupBy="cellid",  shape=False, makePhylo=("-f" not in com),  makeTaxo=("-t" not in com))
+            com["-g"]="Group_cellid"
+            com["sample"]=sample
+            com["groupBy"]=groupBy
+        namefile=".".join(IN.split(".")[:-1])
         com["-s"]="Sample"
-        if not com.has_key("-t"):
+        if ("-t" not in com):
             com["-t"]=namefile+".taxonomy"
         if not com.has_key("-f"):
             com["-f"]=namefile+".tree"
@@ -183,5 +207,11 @@ if __name__=="__main__":
     #CallITOL for graph
     #makeITOLcall(db.tree,buffITOL, buffHIST, com)
     if com["-G"]=="1":
-        makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=True,prefix=com["-o"])
+        if com["-H"]==0:
+            if "-M" in com:
+                makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"],shape="subBiome/subBiome.shp", Sample=com["sample"], groupBy=com["groupBy"])
+            else:
+                makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=True,prefix=com["-o"], Sample=com["sample"], groupBy=com["groupBy"])
+        else:
+            makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"],shape="subgrid_ease/subgrid.shp", Sample=com["sample"], groupBy=com["groupBy"])
     
