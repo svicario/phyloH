@@ -8,12 +8,15 @@ tree and the estimate of entropy and mutual information on itol web site (http:/
 
 With Complements to: [ETE2 python library](http://pythonhosted.org/ete2/),[iTOL (Interactive Tree of Life)](http://itol.embl.de/), [Python API for the Interactive Tree of Life ](https://github.com/albertyw/itol-api), [numpy](http://www.numpy.org/),[scipy](http://www.scipy.org/), [Biopython](http://biopython.org/wiki/Main_Page)
 ###RUNNING FROM COMMAND LINE
-python esecutorePhyloH5.py [-option] [value]
+python esecutorePhyloHPandas.py [-option] [value]
 
-option -f  -s, -g, -r are mandatory
+option -s, -r  are mandatory
+if -G 0 then also -f -g are mandatory
+-H is read only if -G 1 
+-M is read only if -G 1 and -H different from zero
 
 to obtain the help call
-"python esecutorePhyloH9.py"
+"python esecutorePhyloHPandas.py"
 
 
      -f filename        Use this file as the phylogeny file [phylo].
@@ -30,6 +33,8 @@ to obtain the help call
      -e    0 or 1       Assume that each sampling site have the same sampling effort. This option equalize the weigth of the different sample
      --treesimplify     Collapse after analysis all descedant nodes that have weighted length to tips less that given [0.01]
      -G    0 or 1       Geographic analysis mode: group and sample and potentially taxonomy  and tree are all embedded in a CSV that includes also geographical location of observations.
+     -H    INT          If data are Geographic, group observation by hexagonal grid of a given span in meters, if zero no gridding is applied and locationID parameters is expected
+     -M    string       Cross obseration with a shapecollection  -G need to be 1 and -H need to be 0
  
   
  run example using following call 
