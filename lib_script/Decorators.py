@@ -187,6 +187,9 @@ def DecorateH(H, db, alpha=0.05, taxonomy=None):
         H["MIByBranch"].set_index(keys=Series(["Unknown"]*H["MIByBranch"].shape[0],name="Taxonomy"), append=True, inplace=True)
         #print H["MIByBranch"]
     H["MI_KL"]=DataFrame(H["MI_KL"], columns=["KullBack-Lieber(PG(i)||Ptot(i)"])
+    H["MI_KL"]["pvalue"]=numpy.sum(H["KL_perm"].values.transpose()>H["MI_KL"].values,axis=1)/float(H["KL_perm"].shape[0])
+    SGN=H["MI_KL"].pvalue<alpha/(H["MI_KL"].pvalue.rank(method="first")+1)
+    H["MI_KL"]["Seq_Bonferroni"]=SGN
     H["MIByBranch"].sort(columns=("I(Ti,G)","TurnOver"),inplace=True,ascending=False)
 
 def spacedColors(cat):
@@ -288,7 +291,7 @@ def MakeHTML(H,com, errormessage=None):
               "Turnover is the percentage of observations not shared across groups",
               "Pvalue is computed with Permutation procedure"],
         'MI_KL':["Difference of each group from total:",
-                 "phylogenetic Kullback-Leiber distance between each group and the overall data"],
+                 "phylogenetic Kullback-Leiber distance between each group and the overall data", "P Value and Seq_Bonferroni are the probability that the difference is caused by sampling fluctuation and significance after Sequential Bonferroni correction and alpha=0.05, respectevely"],
         'DistTurnover':["Pairwise TurnOver between groups"]    
     }
     def floater(x, perc=False):
@@ -315,7 +318,7 @@ def MakeHTML(H,com, errormessage=None):
         GlobalStatistics+=Tagify("Errors", "H3")
         for e in errormessage:
             GlobalStatistics+=Tagify(e, "p")
-    for k in ['counts', 'ExperimentalDesign', 'Gammas','Alphas', 'MI', 'MI_KL','DistTurnover']:
+    for k in [x for x in ['counts', 'ExperimentalDesign', 'Gammas','Alphas', 'MI', 'MI_KL','DistTurnover'] if x in H]:
         GlobalStatistics+=Tagify(Titles[k].pop(0),"H2")+"\n"
         for title in Titles[k]:
             GlobalStatistics+=Tagify(title,"p")+"\n"

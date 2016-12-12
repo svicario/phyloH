@@ -93,7 +93,8 @@ def addVec(gisbase,gisdb, mapset, pathPythonScript, dirName='terr-ecoregions-TNC
     import grass.script.setup as gsetup
     gsetup.init(gisbase,gisdb, location, mapset)
     wdIN=os.path.dirname(os.path.abspath(pathPythonScript))
-    gscript.run_command('v.in.ogr',input=os.path.join(wdIN,addon,dirName),layer=fileName,output=name, overwrite=True)
+    #temp=os.path.join(wdIN,addon,dirName)
+    gscript.run_command('v.in.ogr',input=dirName,layer=fileName,output=name, overwrite=True)
 
 def Cross(gisbase,gisdb, mapset, location="cea", vector_name="grid", point_name="sample", group=None):
     import grass

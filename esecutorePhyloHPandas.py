@@ -117,7 +117,7 @@ if __name__=="__main__":
     com["call"]=" ".join(sys.argv)
     if com["-G"]=="1":
         from lib_script.geoAddOn import *
-        if com["-H"]==0:
+        if int(com["-H"])==0:
             if "-M" in com:
                 if com["-M"]=="TNC":
                     if com["-g"].lower() in ["biomes", "major_habitat_type"]: com["-g"]="WWF_MHTNAM"
@@ -176,6 +176,7 @@ if __name__=="__main__":
     
     Per=db.PermutationTestPandas(reps=int(com["-r"]),q=com["-q"])
     H=db.GetEntropiesPandas(q=com["-q"], Pairwise=int(com["-k"]), EqualEffort=int(com["-e"]))
+    H["KL_perm"]=DataFrame([x["MI_KL"] for x in Per])
     DecorateH(H, db, taxonomy=com.setdefault("-t",None))
     if com["--QR"]==1:
         blacklist=BlackLister(toTrash="SampleAndTree")

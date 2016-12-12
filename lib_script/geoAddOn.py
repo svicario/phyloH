@@ -141,9 +141,9 @@ def makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=True, prefix="
     ## Default coordinates
     proGeoColumns=["decimalLongitude","decimalLatitude"]
     ##Default attributes
-    proValueColumns=[Sample,groupBy,"Diversity","Beta_Diversity"]
+    proValueColumns=[Sample,groupBy,"Diversity","Beta_Diversity", "Beta_Pvalue", "SGN_SeqBonferroni"]
     if Sample==groupBy:
-        proValueColumns=[Sample,"Diversity","Beta_Diversity"]
+        proValueColumns=[Sample,"Diversity","Beta_Diversity", "Beta_Pvalue", "SGN_SeqBonferroni"]
     
     #Getting original observation
     filenametab= [ x for x in os.listdir(path) if x.split("_")[-1]=="Clean.tab"][0]
@@ -183,9 +183,9 @@ def makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=True, prefix="
     print Sample
     print DDD.head()
     filename=[ x for x in os.listdir(path) if x.find(prefix+"_MI_KL.csv")>-1][0]
-    z=Series.from_csv(path+filename,sep="\t", header=0)
+    z=DataFrame.from_csv(path+filename,sep="\t", header=0)
     z.index=z.index.astype("str")
-    z.name="Beta_Diversity"
+    z.columns=["Beta_Diversity","Beta_Pvalue", "SGN_SeqBonferroni"]
     print( z.index,DDD.columns)
     DDD=DDD.join(z,on=groupBy)
     
@@ -216,6 +216,8 @@ def makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=True, prefix="
         w.field('Grouping',"C",40)
         w.field('Diversity',"N",12,7)
         w.field('Beta_Diversity',"N",12,7)
+        w.field('Beta_P_value',"N",12,7)
+        w.field('Beta_SignSeqBonferroni',"C",5)
         if "Z" in D.columns:
             w.field("Z","N",8,0)
         for ProGeo, ProValue in zip(ProGeos.values,ProValues.values):
@@ -350,16 +352,19 @@ def GridDecorator(filename, dictRES, addN=True):
     The link variable between filename and dictRES is the variable Grouping 
     """
     print("GRIDDECORATOR")
+    print dictRES.head()
     from pandas import isnull
     pathname=os.path.dirname(filename)
     basename=os.path.basename(filename)
     R=shapefile.Reader(filename)
     w = shapefile.Writer(R.shapeType)
-    if dictRES.shape[1]==4:
+    if dictRES.shape[1]==6:
         w.field('EventID',"C",40)
     w.field('Grouping',"C",40)
     w.field('Diversity',"N",12,7)
     w.field('Beta_Diversity',"N",12,7)
+    w.field('Beta_P_value',"N",12,7)
+    w.field('Beta_SignSeqBonferroni',"C",6)
     print dictRES.head()
     for shapeRecord in R.shapeRecords():
         Key=str(shapeRecord.record[0])

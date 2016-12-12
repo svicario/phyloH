@@ -210,21 +210,22 @@ def MatrixKL(Depths, desc,L,D, Env=None, Perm=False, Pairwise=True, EqualEffort=
         res["Pie"]=Pie
         res["Pis"]=Pis
         res["counts"]=Tots
-        DistMatrix=DataFrame( columns=groupLevels,index=groupLevels)
-        while groupLevels:
-            G=groupLevels.pop()
-            for g in groupLevels:
-                Pisd=Pis[[G,g]]
-                Ped=Pe[[G,g]]/Pe[[G,g]].values.sum()
-                Pied=(Pisd*Pise[[G,g]].values[0]).sum(axis=1, level="Group").fillna(0)[[G,g]]
-                Pid=(Pied*Ped[[G,g]].values[0]).sum(axis=1).fillna(0)
-                Ted=(L.BL.values*Pied.transpose()).transpose().sum()
-                Td=(L.BL.values*Pid).sum()
-                HTd=ChaoShannon(Pid,L,Td).values.sum()
-                HTgivenEd=(Ped*(ChaoShannon(Pied,L,Ted).sum())).values.sum()
-                hed=-(Ped*log(Ped)).fillna(value=0).values.sum()
-                DistMatrix.loc[G,g]=(HTd-HTgivenEd)/hed
-        res["DistTurnover"]=DistMatrix
+        if Pe.shape!=Ps.shape:
+            DistMatrix=DataFrame( columns=groupLevels,index=groupLevels)
+            while groupLevels:
+                G=groupLevels.pop()
+                for g in groupLevels:
+                    Pisd=Pis[[G,g]]
+                    Ped=Pe[[G,g]]/Pe[[G,g]].values.sum()
+                    Pied=(Pisd*Pise[[G,g]].values[0]).sum(axis=1, level="Group").fillna(0)[[G,g]]
+                    Pid=(Pied*Ped[[G,g]].values[0]).sum(axis=1).fillna(0)
+                    Ted=(L.BL.values*Pied.transpose()).transpose().sum()
+                    Td=(L.BL.values*Pid).sum()
+                    HTd=ChaoShannon(Pid,L,Td).values.sum()
+                    HTgivenEd=(Ped*(ChaoShannon(Pied,L,Ted).sum())).values.sum()
+                    hed=-(Ped*log(Ped)).fillna(value=0).values.sum()
+                    DistMatrix.loc[G,g]=(HTd-HTgivenEd)/hed
+            res["DistTurnover"]=DistMatrix
         if Pairwise:
             DistMatrix=DataFrame( columns=sampleLevels,index=sampleLevels)
             #make a copy
