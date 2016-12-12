@@ -1,4 +1,4 @@
-from pandas import DataFrame, Series,to_datetime
+from pandas import DataFrame, Series,to_datetime, read_csv
 import shapefile
 from geojson import Feature, Point, FeatureCollection, GeometryCollection
 import geojson
@@ -314,7 +314,7 @@ def GridMaker(samplefilename, sizeg, pathPythonScript):
 
 def ShapeLoader(shapeName,samplefilename ,pathPythonScript, group="WWF_MHTNAM"):
     from GrassLand import *
-    dfOr=DataFrame.from_csv(samplefilename,sep=",")
+    dfOr=read_csv(samplefilename,sep=",")
     gisbase,gisdb, mapset=SetUp(pathPythonScript=pathPythonScript)
     LoadData(gisbase,gisdb, mapset, samplefile=samplefilename)
     addVec(gisbase, gisdb,mapset,pathPythonScript=pathPythonScript,dirName=os.path.dirname(shapeName), fileName=os.path.basename(shapeName))
