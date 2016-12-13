@@ -208,7 +208,7 @@ if __name__=="__main__":
     #CallITOL for graph
     #makeITOLcall(db.tree,buffITOL, buffHIST, com)
     if com["-G"]=="1":
-        if com["-H"]==0:
+        if com["-H"]=="0":
             if "-M" in com:
                 makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"],shape="subBiome/subBiome.shp", Sample=com["sample"], groupBy=com["groupBy"])
             else:
