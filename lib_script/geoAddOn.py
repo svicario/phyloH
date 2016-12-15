@@ -319,7 +319,7 @@ def ShapeLoader(shapeName,samplefilename ,pathPythonScript, group="WWF_MHTNAM"):
     LoadData(gisbase,gisdb, mapset, samplefile=samplefilename)
     addVec(gisbase, gisdb,mapset,pathPythonScript=pathPythonScript,dirName=os.path.dirname(shapeName), fileName=os.path.basename(shapeName))
     Cross(gisbase,gisdb, mapset, group=group,location="ll", vector_name="Biome", point_name="sample")
-    df=DataFrame.from_csv("result.csv",sep="|")
+    df=DataFrame.from_csv("result.csv",sep="|", index_col=None)
     dfOr.loc[:,"cellid"]=df.cellid
     prefix=""
     if df.loc[:,group].dtype!=Series(["ww"]).dtype:
@@ -327,7 +327,7 @@ def ShapeLoader(shapeName,samplefilename ,pathPythonScript, group="WWF_MHTNAM"):
     df.loc[:,group]=[x.replace(" ", "_") for x in df[group].astype("str").tolist()]
     print dfOr.shape, df.shape
     dfOr.loc[:,group]=prefix+df.loc[:,group]
-    dfOr.loc[:,"cellid"]=df.cellid
+    #dfOr.loc[:,"cellid"]=df.cellid
     print(dfOr.head())
     dfOr=dfOr[dfOr.cellid.notnull()]
     dfOr.loc[:,"cellid"]="N"+dfOr.cellid.astype("int").astype("str")
