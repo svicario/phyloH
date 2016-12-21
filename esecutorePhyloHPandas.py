@@ -135,6 +135,7 @@ if __name__=="__main__":
                 com["-g"]="Group_"+ groupBy
                 com["sample"]=sample
                 com["groupBy"]=groupBy
+                IN=com["-s"]
         else:
             GridMaker(com["-s"],com["-H"], com["call"].split(" ")[0])
             IN=os.path.dirname(os.path.abspath(com["-s"]))+os.path.sep+"grid_"+os.path.basename(com["-s"])
