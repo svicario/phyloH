@@ -115,6 +115,7 @@ if __name__=="__main__":
         print spiegazione
         raise ImportError
     com["call"]=" ".join(sys.argv)
+    print "sono qui"
     if com["-G"]=="1":
         from lib_script.geoAddOn import *
         if int(com["-H"])==0:
