@@ -176,6 +176,7 @@ def makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=True, prefix="
     
     #D["Grouping"]=D["locationID"].replace(Groups)
     D[Sample]=D[Sample].astype("str")
+    D[groupBy]=D[groupBy].astype("str")
     DDD=D.groupby(Sample).first()
     #This is necessery because otherwise group columns disapear from data set
     DDD.reset_index(inplace=True)
@@ -250,7 +251,6 @@ def makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=True, prefix="
             ID=ProValues.iloc[i]["eventID"]
             geoPoints.append(Feature(geometry=Point(Position), id=ID, properties=temp))
         outjson=FeatureCollection(geoPoints)
-        #print outjson
         handle=open(prefix+".geojson","w")
         handle.write(geojson.dumps(outjson, indent=4, separators=(',', ': ')))
         handle.close()

@@ -119,6 +119,7 @@ if __name__=="__main__":
     if com["-G"]=="1":
         from lib_script.geoAddOn import *
         if int(com["-H"])==0:
+            print "H0"
             if "-M" in com:
                 if com["-M"]=="TNC":
                     if com["-g"].lower() in ["biomes", "major_habitat_type"]: com["-g"]="WWF_MHTNAM"
@@ -217,7 +218,7 @@ if __name__=="__main__":
             if "-M" in com:
                 makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"],shape="subBiome/subBiome.shp", Sample=com["sample"], groupBy=com["groupBy"])
             else:
-                makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=True,prefix=com["-o"], Sample=com["sample"], groupBy=com["groupBy"])
+                makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"], Sample=com["sample"], groupBy=com["groupBy"])
         else:
             makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"],shape="subgrid_ease/subgrid.shp", Sample=com["sample"], groupBy=com["groupBy"])
     
