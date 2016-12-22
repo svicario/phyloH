@@ -82,7 +82,7 @@ def QRtree(db, H):
     H["MI"].loc["I(T,S|E)"]["nats","TurnOver"]= temp["I(Ti,S|E)"]["nats","TurnOver"].sum()
 
 if __name__=="__main__":
-    com={"-x":"nexml","None":1, "--QR":"0","--QRC":"0","-k":0, "-e":0,"-q":1,"-G":0,"-H":0,"-g":"locationID"}
+    com={"-x":"nexml","None":1, "--QR":"0","--QRC":"0","-k":0, "-e":0,"-q":1,"-G":0,"-H":"0","-g":"locationID"}
     count=1
     key=None
     for i in sys.argv:
@@ -131,13 +131,14 @@ if __name__=="__main__":
                     com["-s"]="Sample"
                     com["sample"]=sample
                     com["groupBy"]=groupBy
+                    print "option TNC with GRASS"
             else:
                 sample,groupBy=makePhyloHInput(csv=com["-s"],sep=",", groupBy=com["-g"],  shape=False, makePhylo=("-f" not in com),  makeTaxo=("-t" not in com))
                 com["-g"]="Group_"+ groupBy
                 com["sample"]=sample
                 com["groupBy"]=groupBy
                 IN=com["-s"]
-                print "goodthing"
+                print "option CSV"
         else:
             GridMaker(com["-s"],com["-H"], com["call"].split(" ")[0])
             IN=os.path.dirname(os.path.abspath(com["-s"]))+os.path.sep+"grid_"+os.path.basename(com["-s"])
@@ -145,6 +146,7 @@ if __name__=="__main__":
             com["-g"]="Group_cellid"
             com["sample"]=sample
             com["groupBy"]=groupBy
+            print "option GRID with GRASS"
         namefile=".".join(IN.split(".")[:-1])
         com["-s"]="Sample"
         if ("-t" not in com):
