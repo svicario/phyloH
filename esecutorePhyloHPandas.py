@@ -82,7 +82,7 @@ def QRtree(db, H):
     H["MI"].loc["I(T,S|E)"]["nats","TurnOver"]= temp["I(Ti,S|E)"]["nats","TurnOver"].sum()
 
 if __name__=="__main__":
-    com={"-x":"nexml","None":1, "--QR":"0","--QRC":"0","-k":0, "-e":0,"-q":1,"-G":0,"-H":"0","-g":"locationID"}
+    com={"-x":"nexml","None":1, "--QR":"0","--QRC":"0","-k":0, "-e":0,"-q":1,"-G":0,"-H":"0","-g":"locationID","-M":"0"}
     count=1
     key=None
     for i in sys.argv:
@@ -120,19 +120,18 @@ if __name__=="__main__":
         from lib_script.geoAddOn import *
         if int(com["-H"])==0:
             print "H0"
-            if "-M" in com:
-                if com["-M"]=="TNC":
-                    if com["-g"].lower() in ["biomes", "major_habitat_type"]: com["-g"]="WWF_MHTNAM"
-                    if com["-g"].lower() in ["biogeographic_region", "realm"]: com["-g"]="WWF_REALM2"
-                    ShapeLoader(shapeName="terr-ecoregions-TNC/tnc_terr_ecoregions",samplefilename=com["-s"],pathPythonScript=com["call"].split(" ")[0], group=com["-g"])
-                    IN=os.path.dirname(os.path.abspath(com["-s"]))+os.path.sep+"grid_"+os.path.basename(com["-s"])
-                    sample,groupBy=makePhyloHInput(csv=IN,sep=",", groupBy=com["-g"],  shape=False, makePhylo=("-f" not in com),  makeTaxo=("-t" not in com))
-                    print ("Sample", sample, groupBy)
-                    com["-g"]="Group_"+com["-g"]
-                    com["-s"]="Sample"
-                    com["sample"]=sample
-                    com["groupBy"]=groupBy
-                    print "option TNC with GRASS"
+            if com["-M"]=="TNC":
+                if com["-g"].lower() in ["biomes", "major_habitat_type"]: com["-g"]="WWF_MHTNAM"
+                if com["-g"].lower() in ["biogeographic_region", "realm"]: com["-g"]="WWF_REALM2"
+                ShapeLoader(shapeName="terr-ecoregions-TNC/tnc_terr_ecoregions",samplefilename=com["-s"],pathPythonScript=com["call"].split(" ")[0], group=com["-g"])
+                IN=os.path.dirname(os.path.abspath(com["-s"]))+os.path.sep+"grid_"+os.path.basename(com["-s"])
+                sample,groupBy=makePhyloHInput(csv=IN,sep=",", groupBy=com["-g"],  shape=False, makePhylo=("-f" not in com),  makeTaxo=("-t" not in com))
+                print ("Sample", sample, groupBy)
+                com["-g"]="Group_"+com["-g"]
+                com["-s"]="Sample"
+                com["sample"]=sample
+                com["groupBy"]=groupBy
+                print "option TNC with GRASS"
             else:
                 sample,groupBy=makePhyloHInput(csv=com["-s"],sep=",", groupBy=com["-g"],  shape=False, makePhylo=("-f" not in com),  makeTaxo=("-t" not in com))
                 com["-g"]="Group_"+ groupBy
@@ -215,7 +214,7 @@ if __name__=="__main__":
     #makeITOLcall(db.tree,buffITOL, buffHIST, com)
     if com["-G"]=="1":
         if com["-H"]=="0":
-            if "-M" in com:
+            if com["-M"]=="TNC":
                 makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"],shape="subBiome/subBiome.shp", Sample=com["sample"], groupBy=com["groupBy"])
             else:
                 makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"], Sample=com["sample"], groupBy=com["groupBy"])
