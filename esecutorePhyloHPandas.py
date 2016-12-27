@@ -220,4 +220,4 @@ if __name__=="__main__":
                 makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"], Sample=com["sample"], groupBy=com["groupBy"])
         else:
             makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"],shape="subgrid_ease/subgrid.shp", Sample=com["sample"], groupBy=com["groupBy"])
-    
+    print (os.listdir("./"))
