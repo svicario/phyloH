@@ -283,7 +283,7 @@ class DBdata:
         for i in range(self.countTable.shape[0]):
             for g,columns in Groups:
                 for c in columns:
-                    self.itemTable+=self.countTable[i,c]*[[self.SeqName[i],c,g]]
+                    self.itemTable+=int(self.countTable[i,c])*[[self.SeqName[i],c,g]]
         
         self.itemTable=numpy.array(self.itemTable)
         self.indexID={}
