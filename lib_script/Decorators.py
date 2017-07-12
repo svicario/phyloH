@@ -190,7 +190,7 @@ def DecorateH(H, db, alpha=0.05, taxonomy=None):
     H["MI_KL"]["pvalue"]=numpy.sum(H["KL_perm"].values.transpose()>H["MI_KL"].values,axis=1)/float(H["KL_perm"].shape[0])
     SGN=H["MI_KL"].pvalue<alpha/(H["MI_KL"].pvalue.rank(method="first")+1)
     H["MI_KL"]["Seq_Bonferroni"]=SGN
-    H["MIByBranch"].sort(columns=("I(Ti,G)","TurnOver"),inplace=True,ascending=False)
+    H["MIByBranch"].sort_values(by=[("I(Ti,G)","TurnOver")], axis="index",inplace=True,ascending=False)
 
 def spacedColors(cat):
     step=360.0/cat
