@@ -40,6 +40,7 @@ to obtain the help call
  run example using following call 
  ../esecutorePhyloHPandas.py -f test/Echinodermata.tree -s test/sampleTest  -g test/GroupTest -q 1 -r 2 -o xxx -e 0 -k 0
  
- The script is exposed behind a webservice. For details visit https://www.biodiversitycatalogue.org/rest_methods/143
+ The script is exposed behind a webservice. 
+ try http://ecovrp.geodab.eu/wps/testUI/ or for old version visit https://www.biodiversitycatalogue.org/rest_methods/143
 
 Send e-mails to Saverio Vicario (the repo owner) for questions and comments
