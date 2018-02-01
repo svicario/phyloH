@@ -9,7 +9,7 @@
       "description": "the file is a CSV that follow darwin archive standard and heading following TWDG ",
       "name": "prefix for output",
       "obligation": true,
-      "target": "SAMPLE_FILENAME",
+      "target": "SAMPLE_FILENAME"
  },
  {
       "id": "MPOLYGON",
@@ -19,8 +19,7 @@
       "name": "Group by Shape",
       "valueSchema": "url",
       "obligation": true,
-      "target": "terr-ecoregions-TNC.tar.gz",
-      "defaultValue":"0"
+      "target": "terr-ecoregions-TNC.tar.gz"
  },
 
  
@@ -56,6 +55,7 @@
  }
   ]
 }
+
 
 
 
