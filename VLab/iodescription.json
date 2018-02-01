@@ -1,0 +1,63 @@
+{
+  "inputs": [
+
+ 
+  {
+      "id": "SAMPLE_FILENAME",
+      "inputType": "individual",
+      "valueType": "value",
+      "description": "the file is a CSV that follow darwin archive standard and heading following TWDG ",
+      "name": "prefix for output",
+      "obligation": true,
+      "hasDefault": true,
+,
+      "target": "SAMPLE_FILENAME",
+      "defaultValue":
+ },
+ {
+      "id": "MPOLYGON",
+      "inputType": "individual",
+      "valueType": "value",
+      "description": "Group observations with a shape collection,Grid Size need to be 0",
+      "name": "Group by Shape",
+      "valueSchema": "url"
+      "hasDefault": true,
+      "target": "GRID_SIZE",
+      "defaultValue":"0"
+ },
+
+ 
+  ],
+  "outputs": [
+    {
+      "id": "Overall_GZip",
+      "outputType": "individual",
+      "valueType": "value",
+      "description": "All output compressed in one file to be downloaded",
+      "name": "Overall Output",
+      "valueSchema": "url",
+      "target": "Fulloutput.tgz"
+ },
+ {
+      "id": "Overall_GZip",
+      "outputType": "individual",
+      "valueType": "value",
+      "description": "All output compressed in one file to be downloaded",
+      "name": "Overall Output",
+      "valueSchema": "url",
+      "target": "Shapefile.tgz"
+ }
+ ,
+ {
+      "id": "Overall_GZip",
+      "outputType": "individual",
+      "valueType": "value",
+      "description": "All output compressed in one file to be downloaded",
+      "name": "Overall Output",
+      "valueSchema": "url",
+      "target": "HTMLReport.tgz"
+ }
+  ]
+}
+
+
