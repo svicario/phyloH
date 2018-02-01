@@ -9,20 +9,17 @@
       "description": "the file is a CSV that follow darwin archive standard and heading following TWDG ",
       "name": "prefix for output",
       "obligation": true,
-      "hasDefault": true,
-,
       "target": "SAMPLE_FILENAME",
-      "defaultValue":
  },
  {
       "id": "MPOLYGON",
       "inputType": "individual",
       "valueType": "value",
-      "description": "Group observations with a shape collection,Grid Size need to be 0",
+      "description": "Group observations with a shape collection, at the moment the shape need to have the attribute columns WWF_MHTNAM",
       "name": "Group by Shape",
-      "valueSchema": "url"
-      "hasDefault": true,
-      "target": "GRID_SIZE",
+      "valueSchema": "url",
+      "obligation": true,
+      "target": "terr-ecoregions-TNC.tar.gz",
       "defaultValue":"0"
  },
 
@@ -59,5 +56,7 @@
  }
   ]
 }
+
+
 
 
