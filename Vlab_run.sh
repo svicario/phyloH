@@ -1,7 +1,4 @@
-
-
-
-
+tar -xzf terr-ecoregions-TNC.tar.gz
 
 python phyloH/esecutorePhyloHPandas.py -M TNC -G 1  -s SAMPLE_FILENAME -g "WWF_MHTNAM" -r 100 -o out -e 0 -k 0
 
