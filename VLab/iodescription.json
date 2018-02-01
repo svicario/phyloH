@@ -20,7 +20,7 @@
       "valueSchema": "url",
       "obligation": true,
       "target": "terr-ecoregions-TNC.tar.gz"
- },
+ }
 
  
   ],
