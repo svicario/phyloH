@@ -20,7 +20,7 @@ def SetUp(pathPythonScript):
     A.extractall()
     
     
-    grass7bin = 'grass70'
+    grass7bin = 'grass74'
     #gisdb = os.path.join(os.path.expanduser("~"), "grass", "geodb7")
     gisdb=os.path.join(os.path.realpath(wdout), "grass", "geodb7")
     mapset   = "PERMANENT"
@@ -124,7 +124,7 @@ def Cross(gisbase,gisdb, mapset, location="cea", vector_name="grid", point_name=
     b = str(','.join(str(e) for e in a))
     subname='sub'+vector_name
     gscript.run_command('v.extract',input=vector_name,output=subname, where="cat in (%s)" % b,overwrite=True,quiet=True)
-    gscript.run_command('v.out.ogr',input=subname,output=subname+suffix,overwrite=True,quiet=True,flags="m")
+    gscript.run_command('v.out.ogr',input=subname,output=subname+suffix,overwrite=True,quiet=True,flags="m",format="ESRI_Shapefile")
 
 
 def hexagrid(gisbase,gisdb, mapset, location="cea",radius=15000):
@@ -157,4 +157,4 @@ def hexagrid(gisbase,gisdb, mapset, location="cea",radius=15000):
     a.discard('')
     b = str(','.join(str(e) for e in a))
     gscript.run_command('v.extract',input='grid',output='subgrid', where="cat in (%s)" % b,overwrite=True,quiet=True)
-    gscript.run_command('v.out.ogr',input='subgrid',output='subgrid_ease',overwrite=True,quiet=True)
+    gscript.run_command('v.out.ogr',input='subgrid',output='subgrid_ease',overwrite=True,quiet=True,format="ESRI_Shapefile")
