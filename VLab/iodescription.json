@@ -10,6 +10,7 @@
       "name": "commandfile",
       "obligation": true,
       "valueSchema":"url",
+      "hasDefault":false,
       "target": "CMDFile"
  },
  {
@@ -20,6 +21,7 @@
       "name": "individuals observed species Phylogeny",
       "obligation": true,
       "valueSchema":"url",
+      "hasDefault":false,
       "target": "PhyloFile"
  },
     {
@@ -30,6 +32,7 @@
       "name": "individuals counts across locality/ geographic locations",
       "obligation": true,
       "valueSchema":"url",
+      "hasDefault":false,
       "target": "SampleFile"
  },
  {
