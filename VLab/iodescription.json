@@ -2,14 +2,32 @@
   "inputs": [
 
  
-  {
-      "id": "SAMPLE_FILENAME",
+{
+      "id": "CMDFile",
       "inputType": "individual",
       "valueType": "value",
-      "description": "the file is a CSV that follow darwin archive standard and heading following TWDG ",
-      "name": "prefix for output",
+      "description": "File of CMD as 2 or more columns of csv. First columns would be the flag, second the values",
+      "name": "commandfile",
       "obligation": true,
-      "target": "SAMPLE_FILENAME"
+      "target": "CMDFile"
+ },
+ {
+      "id": "Phylogeny",
+      "inputType": "individual",
+      "valueType": "value",
+      "description": "Use this file as the phylogeny file",
+      "name": "individuals observed species Phylogeny",
+      "obligation": true,
+      "target": "PhyloFile"
+ },
+    {
+      "id": "SampleFile",
+      "inputType": "individual",
+      "valueType": "value",
+      "description": "Use this file as the sample file [sample].If '-G 1' the file is a CSV that follow darwin archive standard and heading following TWDG",
+      "name": "individuals counts across locality/ geographic locations",
+      "obligation": true,
+      "target": "SampleFile"
  },
  {
       "id": "MPOLYGON",
@@ -18,7 +36,9 @@
       "description": "Group observations with a shape collection, at the moment the shape need to have the attribute columns WWF_MHTNAM",
       "name": "Group by Shape",
       "valueSchema": "url",
-      "obligation": true,
+      "obligation": false,
+      "hasDefault":true,
+      "defaultValue":"http://cloud.recas.ba.infn.it:8080/v1/AUTH_fb6d6fcd0e194a96bb6d0420dce8332f/backgroundinfo/terr-ecoregions-TNC.tar.gz"
       "target": "terr-ecoregions-TNC.tar.gz"
  }
 
