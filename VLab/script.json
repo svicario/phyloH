@@ -7,13 +7,13 @@
       "pathType": "FILE"
  },
     {
-      "repoPath": "lib_script/",
-      "targetPath": "lib_script/",
+      "repoPath": "lib_script",
+      "targetPath": "lib_script",
       "pathType": "DIRECTORY"
  },
     {
-      "repoPath": "AncillaryFiles/",
-      "targetPath": "AncillaryFiles/",
+      "repoPath": "AncillaryFiles",
+      "targetPath": "AncillaryFiles",
       "pathType": "DIRECTORY"
  }
   ]
