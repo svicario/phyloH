@@ -1,10 +1,6 @@
 {
   "scripts": [
-    {
-      "repoPath": "Vlab_run.sh",
-      "targetPath": "Vlab_run.sh",
-      "pathType": "FILE"
- },
+
     {
       "repoPath": "esecutorePhyloHPandas.py",
       "targetPath": "esecutorePhyloHPandas.py",
