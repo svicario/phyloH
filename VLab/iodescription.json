@@ -9,8 +9,8 @@
       "description": "File of CMD as 2 or more columns of csv. First columns would be the flag, second the values",
       "name": "commandfile",
       "obligation": true,
-      "valueSchema":"url",
       "hasDefault":false,
+      "valueSchema":"url",
       "target": "CMDFile"
  },
  {
@@ -20,8 +20,8 @@
       "description": "Use this file as the phylogeny file",
       "name": "individuals observed species Phylogeny",
       "obligation": true,
-      "valueSchema":"url",
       "hasDefault":false,
+      "valueSchema":"url",
       "target": "PhyloFile"
  },
     {
@@ -31,8 +31,8 @@
       "description": "Use this file as the sample file [sample].If '-G 1' the file is a CSV that follow darwin archive standard and heading following TWDG",
       "name": "individuals counts across locality/ geographic locations",
       "obligation": true,
-      "valueSchema":"url",
       "hasDefault":false,
+      "valueSchema":"url",
       "target": "SampleFile"
  },
  {
