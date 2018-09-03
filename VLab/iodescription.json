@@ -61,7 +61,7 @@
       "target": "Fulloutput.tgz"
  },
  {
-      "id": "Overall_GZip",
+      "id": "Shape_GZip",
       "outputType": "individual",
       "valueType": "value",
       "description": "All output compressed in one file to be downloaded",
@@ -71,7 +71,7 @@
  }
  ,
  {
-      "id": "Overall_GZip",
+      "id": "HTMLReport_GZip",
       "outputType": "individual",
       "valueType": "value",
       "description": "All output compressed in one file to be downloaded",
