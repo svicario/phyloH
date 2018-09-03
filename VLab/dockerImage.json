@@ -2,7 +2,7 @@
 
   "image": "iiaphylogenetic/phyloh-docker",
   "resources": {
-    "memory_mb": "5000",
+    "memory_mb": "10000",
     "cpu_units": ""
  },
   "container": {
