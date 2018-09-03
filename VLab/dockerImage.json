@@ -11,7 +11,7 @@
       "-c"
  ],
     "command": [
-      "python esecutorePhyloHPandas.py -c CMD.tab"
+      "python esecutorePhyloHPandas.py -f PhyloFile -s SampleFile -c CMDFile"
  ]
   }
 }
