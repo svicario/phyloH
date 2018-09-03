@@ -3,6 +3,8 @@ from lib_script.Decorators import DecorateH, ForITOL, MakeHTML,makeITOLcall,seco
 #from lib_script.graphic import *
 from StringIO import StringIO
 import copy
+import subprocess
+import pandas as pd
 
 def BlackLister(db, toTrash="SampleAndTree", Suffix="QUERY__"):
     """
@@ -110,7 +112,13 @@ if __name__=="__main__":
      -G    0 or 1       Geographic analysis mode: group and sample and potentially taxonomy  and tree are all embedded in a CSV that includes also geographical location of observations.
      -H    INT          If data are Geographic, group observation by hexagonal grid of a given span in meters, if zero no gridding is applied and locationID parameters is expected
      -M    string       Cross obseration with a shapecollection  -G need to be 1 and -H need to be 0
-    """
+     -c  filename       File of CMD as 2 or more columns of csv. First columns would be the flag, second the values
+     --tidy 0 or 1      pack output in 3 tgz     """
+    if "-c" in com:
+        update=pd.read_csv(com["-c"],"\t",header=None, comment="#")
+        com.update(update.iloc[:,:2].values.tolist())
+    if int(com.setdefault("--tidy",0)):
+        StartFiles=os.listdir(os.getcwd())
     if (( (com["--QR"]=="0") and (not '-s' in com) ) | ((not '-f' in com ) and  (com["-G"]=="0"))):
         print spiegazione
         raise ImportError
@@ -220,4 +228,24 @@ if __name__=="__main__":
                 makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"], Sample=com["sample"], groupBy=com["groupBy"])
         else:
             makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"],shape="subgrid_ease/subgrid.shp", Sample=com["sample"], groupBy=com["groupBy"])
+    if int(com.setdefault("--tidy",0)):
+        Files=os.listdir("./")
+        htmlbundle=["external","PhyloCommunity.js"]+[x for x in Files if x.split(".")[-1] in ["html","mibybranch","TreeLabeled"]]
+        p = subprocess.Popen(["tar", "-czf","HTMLReport.tgz"]+htmlbundle, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        if p.returncode != 0:
+            print >>sys.stderr, "ERROR: in" % startcmd
+            sys.exit(-1)
+        shapebundle=[x[0] for x in os.walk(os.getcwd()) if "_".join(x[-1]).find(".shp")>-1]
+        p = subprocess.Popen(["tar", "-czf","Shapefile.tgz"]+shapebundle, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        if p.returncode != 0:
+            print >>sys.stderr, "ERROR: in" % startcmd
+            sys.exit(-1)
+        Fullbundle=[x for x in Files if not x in StartFiles]
+        p = subprocess.Popen(["tar", "-czf","Fulloutput.tgz"]+Fullbundle, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        if p.returncode != 0:
+            print >>sys.stderr, "ERROR: in" % startcmd
+            sys.exit(-1)
     print (os.listdir("./"))
