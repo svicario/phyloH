@@ -11,7 +11,7 @@
       "-c"
  ],
     "command": [
-      "./Vlab_run.sh"
+      "python esecutorePhyloHPandas.py -c CMD.tab"
  ]
   }
 }
