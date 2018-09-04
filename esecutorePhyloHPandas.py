@@ -234,18 +234,18 @@ if __name__=="__main__":
         p = subprocess.Popen(["tar", "-czf","HTMLReport.tgz"]+htmlbundle, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
         if p.returncode != 0:
-            print >>sys.stderr, "ERROR: in" % startcmd
+            print >>sys.stderr, "ERROR: in tar"
             sys.exit(-1)
         shapebundle=[x[0] for x in os.walk(os.getcwd()) if "_".join(x[-1]).find(".shp")>-1]
         p = subprocess.Popen(["tar", "-czf","Shapefile.tgz"]+shapebundle, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
         if p.returncode != 0:
-            print >>sys.stderr, "ERROR: in" % startcmd
+            print >>sys.stderr, "ERROR: in tar" 
             sys.exit(-1)
         Fullbundle=[x for x in Files if not x in StartFiles]
         p = subprocess.Popen(["tar", "-czf","Fulloutput.tgz"]+Fullbundle, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
         if p.returncode != 0:
-            print >>sys.stderr, "ERROR: in" % startcmd
+            print >>sys.stderr, "ERROR: in tar" 
             sys.exit(-1)
     print (os.listdir("./"))
