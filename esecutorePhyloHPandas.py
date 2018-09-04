@@ -229,6 +229,7 @@ if __name__=="__main__":
         else:
             makePhyloHOutput(path="./", Z="maximumDepthInMeters", GeoJson=False,prefix=com["-o"],shape="subgrid_ease/subgrid.shp", Sample=com["sample"], groupBy=com["groupBy"])
     if int(com.setdefault("--tidy",0)):
+        print("tidy")
         Files=os.listdir("./")
         htmlbundle=["external","PhyloCommunity.js"]+[x for x in Files if x.split(".")[-1] in ["html","mibybranch","TreeLabeled"]]
         p = subprocess.Popen(["tar", "-czf","HTMLReport.tgz"]+htmlbundle, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
