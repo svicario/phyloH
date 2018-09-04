@@ -7,7 +7,7 @@ import sys
 if len(sys.argv)>1:
     sep=os.sep
     pathScript=os.path.dirname(os.path.abspath(sys.argv[0]))
-    pathAncillary=os.path.dirname(os.path.abspath(sys.argv[0]))+sep+"AncillaryFiles"+sep
+    pathAncillary=os.path.dirname(os.path.abspath(sys.argv[0]))+sep+"AncillaryFiles"
 
 
 def AddTaxonomy(H, db, taxonomyfile):
@@ -348,7 +348,7 @@ def makeITOL3output(tree, XITOL, HIST, bins, com):
     handle=open(com["-o"]+".TreeLabeled","w")
     handle.write(tree.format("newick"))
     handle.close()
-    histtxt=open(pathAncillary+"ITOLStackedHistogram.txt","r").read()
+    histtxt=open(pathAncillary+sep+"ITOLStackedHistogram.txt","r").read()
     formatdict={
         "Data":HIST.to_csv(header=False,sep=","),
         "NomeRun":com["-o"],
@@ -363,7 +363,7 @@ def makeITOL3output(tree, XITOL, HIST, bins, com):
     Size={}
     bins=["_to_".join(x.split(", "))[1:-1] for x in bins]
     Size.update([(y,str(log(x+1)*51/log(10))) for x,y in enumerate(bins)])
-    Circletxt=open(pathAncillary+"ITOLInternalNodeCircle.txt","r").read()
+    Circletxt=open(pathAncillary+sep+"ITOLInternalNodeCircle.txt","r").read()
     assert len(bins)==10, "Bins are expected to be 10, have you changed the number of the colors?"
     temp=XITOL[XITOL.loc[:,"mode"]=="range"]
     SS=zip(temp.index.tolist(),["2"]*temp.shape[0],[Size[x] for x in temp.label], temp.color, ["1"]*temp.shape[0],["1"]*temp.shape[0],temp.label)
