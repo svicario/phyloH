@@ -65,7 +65,7 @@
       "outputType": "individual",
       "valueType": "value",
       "description": "All output compressed in one file to be downloaded",
-      "name": "Overall Output",
+      "name": "Geographic Output",
       "valueSchema": "url",
       "target": "Shapefile.tgz"
  }
@@ -75,7 +75,7 @@
       "outputType": "individual",
       "valueType": "value",
       "description": "All output compressed in one file to be downloaded",
-      "name": "Overall Output",
+      "name": "HTML Report with phylogenetic parsing",
       "valueSchema": "url",
       "target": "HTMLReport.tgz"
  }
