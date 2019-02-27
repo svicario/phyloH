@@ -299,7 +299,7 @@ def CalcElevation(DictZ):
   return DictZ["ElevationInMeters"]-DictZ["DepthInMeters"]+DictZ["DistanceAboveSurfaceInMeters"]
 
 def GridMaker(samplefilename, sizeg, pathPythonScript):
-    from GrassLand import *
+    from GrassLand import SetUp,LoadData,hexagrid
     dfOr=DataFrame.from_csv(samplefilename,sep=",")
     #dfOr.to_csv("pipe_"+samplefilename,sep="|")
     gisbase,gisdb, mapset=SetUp(pathPythonScript=pathPythonScript)
@@ -313,7 +313,7 @@ def GridMaker(samplefilename, sizeg, pathPythonScript):
     dfOr.to_csv(os.path.dirname(os.path.abspath(samplefilename))+os.path.sep+"grid_"+os.path.basename(samplefilename),sep=",")
 
 def ShapeLoader(shapeName,samplefilename ,pathPythonScript, group="WWF_MHTNAM"):
-    from GrassLand import *
+    from GrassLand import SetUp,LoadData,addVec,Cross
     dfOr=read_csv(samplefilename,sep=",")
     gisbase,gisdb, mapset=SetUp(pathPythonScript=pathPythonScript)
     LoadData(gisbase,gisdb, mapset, samplefile=samplefilename)
