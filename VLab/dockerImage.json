@@ -11,7 +11,7 @@
       "-c"
  ],
     "command": [
-      "Vlab_run.sh"
+      "./Vlab_run.sh"
  ]
   }
 }
