@@ -7,6 +7,11 @@
       "pathType": "FILE"
  },
     {
+      "repoPath": "Vlab_run.sh",
+      "targetPath": "Vlab_run.sh",
+      "pathType": "FILE"
+ },
+    {
       "repoPath": "lib_script",
       "targetPath": "lib_script",
       "pathType": "DIRECTORY"
